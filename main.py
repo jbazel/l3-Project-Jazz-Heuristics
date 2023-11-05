@@ -15,9 +15,13 @@ for n in c.recurse().notesAndRests:
 # chord removal
 for n in c.recurse().getElementsByClass(chord.Chord):
     meas = n.getContextByClass(stream.Measure)
+    print(meas.measureNumber, meas.offset, n.getOffsetInHierarchy(c), n.offset)
     meas.remove(n)
 
-c.show()
+
+
+
+# c.show()
 
 
 # db = "/OpenEWLD-master/OpenEWLD.db"
