@@ -4,19 +4,24 @@ import sqlite3
 us = environment.UserSettings()
 us['musicxmlPath'] ='../../../../../Applications/MuseScore 3.app'
 us['midiPath'] ='../../../../../Applications/GarageBand.app'
-c = music21.converter.parse("OpenEWLD-master/dataset/Alicia_Scott/Annie_Laurie/Annie_Laurie.mxl")
+c = music21.converter.parse("EWLD/dataset/Alicia_Scott/Annie_Laurie/Annie_Laurie.mxl")
 
-# lyric removal
-for n in c.recurse().notesAndRests:
-    if n.lyric:
-        print(n.lyric)
-        n.lyric = ''
+db = sqlite3.connect('EWLD/EWLD.db')
+cursor = db.cursor()
+cursor.execute('SELECT * FROM "work_genres" where "genre" = "Jazz"')
+print(len(cursor.fetchall()))
 
-# chord removal
-for n in c.recurse().getElementsByClass(chord.Chord):
-    meas = n.getContextByClass(stream.Measure)
-    print(meas.measureNumber, meas.offset, n.getOffsetInHierarchy(c), n.offset)
-    meas.remove(n)
+# # lyric removal
+# for n in c.recurse().notesAndRests:
+#     if n.lyric:
+#         print(n.lyric)
+#         n.lyric = ''
+#
+# # chord removal
+# for n in c.recurse().getElementsByClass(chord.Chord):
+#     meas = n.getContextByClass(stream.Measure)
+#     print(meas.measureNumber, meas.offset, n.getOffsetInHierarchy(c), n.offset)
+#     meas.remove(n)
 
 
 
