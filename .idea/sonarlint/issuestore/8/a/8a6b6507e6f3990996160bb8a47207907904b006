@@ -1,0 +1,35 @@
+
+Tpython:S1066Ê"/Merge this if statement with the enclosing one.(‰á®‰şÿÿÿÿ8ÆºÅÉ»1
+Tpython:S1066Ü"/Merge this if statement with the enclosing one.(«å›Ûûÿÿÿÿ8ÉºÅÉ»1
+vpython:S1542"RRename function "detectGenres" to match the regular expression ^[a-z_][a-z0-9_]*$.(…Ğ™áøÿÿÿÿ8ÊºÅÉ»1
+vpython:S117:"XRename this parameter "listOfTuples" to match the regular expression ^[_a-z][a-z0-9_]*$.(ã‰Ì°8ÊºÅÉ»1
+rpython:S1542:"SRename function "twoMostCommon" to match the regular expression ^[a-z_][a-z0-9_]*$.(ã‰Ì°8ÊºÅÉ»1
+~python:S1542C"ZRename function "getComposerInfoByUri" to match the regular expression ^[a-z_][a-z0-9_]*$.(â´˜¹úÿÿÿÿ8ÊºÅÉ»1
+ˆpython:S5886g"iReturn a value of type "dict" instead of "NoneType" or update function "getComposerInfoByName" type hint.(ò¤Ÿù8ËºÅÉ»1
+python:S1542U"[Rename function "getComposerInfoByName" to match the regular expression ^[a-z_][a-z0-9_]*$.(µ§µšùÿÿÿÿ8ËºÅÉ»1
+|python:S5886n"]Return a value of type "str" instead of "NoneType" or update function "formatDate" type hint.(ò¤Ÿù8ÌºÅÉ»1
+tpython:S1542l"PRename function "formatDate" to match the regular expression ^[a-z_][a-z0-9_]*$.(äÁÊñüÿÿÿÿ8ÌºÅÉ»1
+python:S5886Œ"_Return a value of type "dict" instead of "NoneType" or update function "getWorkInfo" type hint.(ò¤Ÿù8ÌºÅÉ»1
+ppython:S1542{"QRename function "getWorkInfo" to match the regular expression ^[a-z_][a-z0-9_]*$.(­•ı·8ÍºÅÉ»1
+ppython:S1542­"QRename function "getTonality" to match the regular expression ^[a-z_][a-z0-9_]*$.(ù¢_8ÍºÅÉ»1
+‚python:S117†"^Rename this local variable "noChordSymbol" to match the regular expression ^[_a-z][a-z0-9_]*$.(øòÇŠÿÿÿÿÿ8ÍºÅÉ»1
+|python:S1542¼"WRename function "scoreIsCompatible" to match the regular expression ^[a-z_][a-z0-9_]*$.(ÄÄ¾Òüÿÿÿÿ8ÎºÅÉ»1
+ypython:S3776¼"TRefactor this function to reduce its Cognitive Complexity from 50 to the 15 allowed.(ÄÄ¾Òüÿÿÿÿ8ĞºÅÉ»1
+opython:S1542´"ORename function "copyToDir" to match the regular expression ^[a-z_][a-z0-9_]*$.(ú¨ï8ĞºÅÉ»1
+python:S1542º"ZRename function "fixStrangeCharacters" to match the regular expression ^[a-z_][a-z0-9_]*$.(úÖ¼Œùÿÿÿÿ8ĞºÅÉ»1
+xpython:S1542Æ"XRename function "writeCompressedMxl" to match the regular expression ^[a-z_][a-z0-9_]*$.(°‹•8ĞºÅÉ»1
+tpython:S1542Ø"TRename function "checkingErrors" to match the regular expression ^[a-z_][a-z0-9_]*$.(Ï ¹8ĞºÅÉ»1
+~python:S1542ã"YRename function "secondHandSongsInfo" to match the regular expression ^[a-z_][a-z0-9_]*$.(Ê¡çÙúÿÿÿÿ8ĞºÅÉ»1
+qpython:S1542„"QRename function "collectData" to match the regular expression ^[a-z_][a-z0-9_]*$.(¡ú¸°8ĞºÅÉ»1
+tpython:S3776„"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(¡ú¸°8ÒºÅÉ»1
+python:S1542Ø"ZRename function "createDataDictionary" to match the regular expression ^[a-z_][a-z0-9_]*$.(Ëşıºüÿÿÿÿ8ÒºÅÉ»1
+mpython:S100‡"NRename method "firstIndex" to match the regular expression ^[a-z_][a-z0-9_]*$.(ÃèÖ8ÒºÅÉ»1
+~python:S1186‘"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ˆµÇãøÿÿÿÿ8ÔºÅÉ»1
+ypython:S1186”"YAdd a nested comment explaining why this method is empty, or complete the implementation.(Ò¶‡8ÖºÅÉ»1
+zpython:S117¢"[Rename this local variable "scriptFile" to match the regular expression ^[_a-z][a-z0-9_]*$.(¨Õ«Á8ÖºÅÉ»1
+opython:S100¬"KRename method "addToDB" to match the regular expression ^[a-z_][a-z0-9_]*$.(ş³Âøÿÿÿÿ8ÖºÅÉ»1
+opython:S100¶"PRename method "__commitData" to match the regular expression ^[a-z_][a-z0-9_]*$.(«“Á©8ÖºÅÉ»1
+ypython:S117Ü"URename this parameter "dbManager" to match the regular expression ^[_a-z][a-z0-9_]*$.(¢Š¸Øşÿÿÿÿ8ÖºÅÉ»1
+Jpython:S1481–"%Remove the unused local variable "e".(¼–¯¸ÿÿÿÿÿ8ÖºÅÉ»1
+ypython:S3776Ü"TRefactor this function to reduce its Cognitive Complexity from 24 to the 15 allowed.(¢Š¸Øşÿÿÿÿ8×ºÅÉ»1
+Ppython:S5806õ"+Rename this variable; it shadows a builtin.( üĞœşÿÿÿÿ8×ºÅÉ»1
