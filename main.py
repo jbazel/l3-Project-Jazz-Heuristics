@@ -29,6 +29,15 @@ CHORD_EQUIVELANCE_DICT = dict()
 
 class Leadsheet:
 
+    class WeightedNote:
+        def __init__(self, pitch, pitch_stability, interval_salience, beat_strength, durational_accent):
+            self.pitch = pitch
+            self.pitch_stability = pitch_stability
+            self.interval_salience = interval_salience
+            self.beat_strength = beat_strength
+            self.durational_accent = durational_accent
+            self.weight = self.pitch_stability + self.interval_salience + self.beat_strength + self.durational_accent
+
     def __init__(self, source):
         self.source = source
         self.score_parsed = music21.converter.parse(source)
@@ -39,6 +48,7 @@ class Leadsheet:
         self.chord_pitched_names = []
         self.melodies_intervals = []
         self.melodies_exact = []
+        self.weighted_melodies = []
         self.melodies = []
 
     def lyric_removal(self):
@@ -71,38 +81,83 @@ class Leadsheet:
 
     def chord_melody_separation(self):
         score = [n for n in self.score_parsed.recurse().notes]
-        # print(score)
         separation = [x for x in range(len(score)) if type(score[x]) == music21.harmony.ChordSymbol]
         self.chords = [score[i] for i in separation]
-
         separation.append(len(score))
         for i in range(len(separation) - 1):
             self.melodies.append(score[separation[i] + 1:separation[i + 1]])
 
-        # print(self.melodies)
-
-    def melody_encoding(self):
-        relative = []
+    def melody_pitch_encoding(self):
         exact = []
         for melody in self.melodies:
-            exact_intervals = []
-            for j in range(len(melody)):
-                note = str(melody[j].pitch)
+            pitches = []
+            for i in range(len(melody)):
+                note = str(melody[i].pitch)
                 note_separated = [note[:-1], note[-1]]
                 octave = int(note_separated[1]) - 3
                 note_value = NOTES[note_separated[0]] + (12 * octave)
-                exact_intervals.append(note_value)
-            exact.append(exact_intervals)
-
+                pitches.append(note_value)
+            exact.append(pitches)
         self.melodies_exact = exact
 
+    def melody_interval_encoding(self):
+        relative = []
         for melody in self.melodies_exact:
             temp_interval = []
-            for j in range(len(melody) - 1):
-                temp_interval.append(melody[j + 1] - melody[j])
+            for i in range(len(melody) - 1):
+                temp_interval.append(melody[i+1] - melody[i])
             relative.append(temp_interval)
-
         self.melodies_intervals = relative
+
+    def weighted_pitch_encoding(self):
+        pitch_weights = []
+        for melody_index, melody in enumerate(self.melodies):
+            note_dict = dict()
+            total_notes = 0
+            weighted_melody = []
+            # created pitch class vector
+            for note_index, note in enumerate(melody):
+                pitch = str(note.pitch)
+                if pitch in note_dict:
+                    note_dict[pitch] += 1
+                else:
+                    note_dict[pitch] = 1
+                total_notes += 1
+
+            # scale it for number of notes
+            for key in note_dict:
+                note_dict[key] /= total_notes
+
+            for note in melody:
+                key = str(note.pitch)
+                weighted_melody.append(note_dict[key] * note.duration.quarterLength)
+
+            pitch_weights.append(weighted_melody)
+
+        self.weighted_melodies = pitch_weights
+
+
+
+
+
+    def melody_reduction(self):
+        for melody_index, melody in enumerate(self.melodies):
+            for note_index, note in enumerate(melody):
+
+                # get interval salience
+                if note_index == 0:
+                    interval_salience = 0
+
+                else:
+                    interval_salience = self.melodies_intervals[melody_index][note_index - 1]
+
+                pitch_stability = self.weighted_melodies[melody_index][note_index]
+                beat_strength = note.beatStrength
+                durational_accent = note.duration.quarterLength
+                weighted = self.WeightedNote(note.pitch, interval_salience, pitch_stability, beat_strength, durational_accent)
+                print(weighted.weight)
+
+
 
 
 # def chord_progression_extractor(progression, key):
@@ -127,20 +182,28 @@ def update_corpus(corp, key):
         corp[key] += 1
     else:
         corp[key] = 1
-
     return corp
 
+
+def build_weighted_note_corpus():
+    pass
 
 def build_duo_corpi(c1, m1, c2, m2):
 
     """
+    METHOD 1:
+
+    this corpus considers simple relation to chords and melodies, both pitched and un-pitched
+
+    for optimal use, pattern matching must be applied as exact matches are unlikely
+
     takes in 2 pairs of chord-melody arrays and builds a 2D dictionary of melody occurrences
     in a both pitched and un-pitched representation.
 
     function will return the respective corpi in the order in which the pairs are passed
     into the function
     """
-    
+
     # for each of chord; build corpus of melodies, then combine to make multi-layerd dict.
     # iteration only necessary for either c1, m1 as mapped directly to c2, m2
     c1_lookup = dict()
@@ -195,6 +258,8 @@ chord_profiles = []
 melody_intervals = []
 melody_exact = []
 
+
+# main processing section
 for i in range(10):
     path = paths[i]
     # print('parsing ', paths)
@@ -202,7 +267,11 @@ for i in range(10):
     sheet = Leadsheet(path)
     sheet.chord_melody_separation()
     sheet.chord_feature_extraction()
-    sheet.melody_encoding()
+    sheet.melody_pitch_encoding()
+    sheet.melody_interval_encoding()
+
+    sheet.weighted_pitch_encoding()
+    sheet.melody_reduction()
 
     chord_intervals.append(sheet.chord_intervals)
     chord_profiles.append(sheet.chord_profiles)
