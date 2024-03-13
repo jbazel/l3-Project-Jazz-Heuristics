@@ -5,3 +5,22 @@ fEWLD/dataset/A.P._Carter/I'm_Thinking_Tonight_of_My_Blue_Eyes/I'm_Thinking_Toni
 fEWLD/dataset/A.P._Carter/I'm_Thinking_Tonight_of_My_Blue_Eyes/I'm_Thinking_Tonight_of_My_Blue_Eyes.csv,a/2/a2721abf3db8c3c1a9c4588a632aa152ac714310
 H
 chord_interval_corpus.py,1/0/10529021781e9e66ef643d237dbb59e44889353d
+D
+EWLD/EWLDcreation.py,8/a/8a6b6507e6f3990996160bb8a47207907904b006
+D
+EWLD/db_creation.sql,8/5/85a8e73aa57583b7bed58689f218ad01f58098f3
+>
+EWLD/README.md,8/3/83f8b46022c5ad5f4fc9487d579f8e644819c8e0
+9
+	search.py,1/2/1288635c2816a600e1506247ea4bf8e509750e69
+7
+test.py,a/3/a36e355ddb203d7d4133221f339dc406cb9f480f
+G
+chord_corpus_builder.py,8/5/854ea72dbbded41a74a782c964a09179840f9d94
+E
+feature_extraction.py,a/6/a64869aed8da5ac8f7934771de4a9f3f3fb58bfc
+7
+main.py,f/1/f1bdda93d9a278e358509d498e17d97764c1fb29
+:
+
+builder.py,8/5/853b6db025a28f38d4ed52311df903d7133b7f49

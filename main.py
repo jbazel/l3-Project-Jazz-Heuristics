@@ -1,8 +1,8 @@
 import music21.converter
 from music21 import *
 import sqlite3
-from chord_corpus_builder import buildCorpus
-from chord_interval_corpus import build_chord_interval_corpus
+from chord_corpus_builder import build_duo_corp
+from chord_corpus_builder import *
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -28,35 +28,63 @@ CHORD_EQUIVELANCE_DICT = dict()
 
 
 class Leadsheet:
-
-    class WeightedNote:
-        def __init__(self, pitch, pitch_stability, interval_salience, beat_strength, durational_accent):
-            self.pitch = pitch
-            self.pitch_stability = pitch_stability
-            self.interval_salience = interval_salience
-            self.beat_strength = beat_strength
-            self.durational_accent = durational_accent
-            self.weight = self.pitch_stability + self.interval_salience + self.beat_strength + self.durational_accent
-
     def __init__(self, source):
         self.source = source
         self.score_parsed = music21.converter.parse(source)
         self.chords = []
-        self.chord_profiles = []
-        self.chord_intervals = []
+        self.chord_pitch_class = []
+        self.chord_profile = []
         self.chord_common_names = []
         self.chord_pitched_names = []
         self.melodies_intervals = []
-        self.melodies_exact = []
+        self.melodies_pitched = []
+        self.pitch_weights = []
         self.weighted_melodies = []
+        self.reduced_melodies = []
+        self.normalized_reduction = []
+        self.reduced_stream = None
         self.melodies = []
 
+    # --------------------------------------------------
     def lyric_removal(self):
         for n in self.score_parsed.recurse().notesAndRests:
             if n.lyric:
                 n.lyric = ""
 
+    # --------------------------------------------------
+    # --------------------------------------------------
+    def chord_melody_separation(self):
+
+        """
+        Chord Melody Separation:
+
+        Works by recursing through all "notes" within the score as
+        both traditional notes and chord symbols are categorized as this.
+
+        By marking chord location by type-checking, the chords and melody
+        can be separated.
+        """
+
+        score = [n for n in self.score_parsed.recurse().notes]
+        separation = [x for x in range(len(score)) if type(score[x]) == music21.harmony.ChordSymbol]
+        self.chords = [score[i] for i in separation]
+        separation.append(len(score))
+        for i in range(len(separation) - 1):
+            self.melodies.append(score[separation[i] + 1:separation[i + 1]])
+
+    # --------------------------------------------------
+    # --------------------------------------------------
     def chord_feature_extraction(self):
+        """
+
+        Extracts features from chord:
+
+        - Pitch Class(represented as a 12-vector of pitches in 12TET)
+        - Profile (pitch class however rotated (transposed), be in key C)
+        - Common names (chord type name from Music21)
+        - Pitched name (pitched chord name from Music21)
+        :return:
+        """
         profiles = []
         intervals = []
         for i in self.chords:
@@ -68,48 +96,61 @@ class Leadsheet:
 
             first_pitch = normal_order[0]
             rotated_normal = [(pc - first_pitch) % 12 for pc in normal_order]
+
+            print(rotated_normal, i.pitchedCommonName, i.commonName)
+
+
             for j in rotated_normal:
                 interval[j] = 1
-
+            # need justification on this method used
             profiles.append(profile)
             intervals.append(interval)
 
-        self.chord_intervals = intervals[1:]
-        self.chord_profiles = profiles[1:]
+        self.chord_profile = intervals[1:]
+        self.chord_pitch_class = profiles[1:]
         self.chord_common_names = [chord.commonName for chord in self.chords]
         self.chord_pitched_names = [chord.pitchedCommonName for chord in self.chords]
 
-    def chord_melody_separation(self):
-        score = [n for n in self.score_parsed.recurse().notes]
-        separation = [x for x in range(len(score)) if type(score[x]) == music21.harmony.ChordSymbol]
-        self.chords = [score[i] for i in separation]
-        separation.append(len(score))
-        for i in range(len(separation) - 1):
-            self.melodies.append(score[separation[i] + 1:separation[i + 1]])
+    # --------------------------------------------------
+    # --------------------------------------------------
 
     def melody_pitch_encoding(self):
         exact = []
         for melody in self.melodies:
             pitches = []
             for i in range(len(melody)):
-                note = str(melody[i].pitch)
-                note_separated = [note[:-1], note[-1]]
-                octave = int(note_separated[1]) - 3
-                note_value = NOTES[note_separated[0]] + (12 * octave)
-                pitches.append(note_value)
+                # note = str(melody[i].pitch)
+                # note_separated = [note[:-1], note[-1]]
+                # octave = int(note_separated[1]) - 3
+                # note_value = NOTES[note_separated[0]] + (12 * octave)
+                # pitches.append(note_value)
+                pitches.append(melody[i].pitch.midi)
             exact.append(pitches)
-        self.melodies_exact = exact
+        self.melodies_pitched = exact
 
+    # --------------------------------------------------
+    # --------------------------------------------------
     def melody_interval_encoding(self):
         relative = []
-        for melody in self.melodies_exact:
+        for melody in self.melodies_pitched:
             temp_interval = []
             for i in range(len(melody) - 1):
-                temp_interval.append(melody[i+1] - melody[i])
+                temp_interval.append(melody[i + 1] - melody[i])
             relative.append(temp_interval)
         self.melodies_intervals = relative
 
+    # --------------------------------------------------
+    # --------------------------------------------------
     def weighted_pitch_encoding(self):
+        """
+        Weighted melody dictionary generated on a per-chord
+        basis.
+
+        Weighting is based on the note duration.
+
+        Possibility to extend this to be a more comprehensive
+        weighting metric.
+        """
         pitch_weights = []
         for melody_index, melody in enumerate(self.melodies):
             note_dict = dict()
@@ -134,163 +175,266 @@ class Leadsheet:
 
             pitch_weights.append(weighted_melody)
 
-        self.weighted_melodies = pitch_weights
+        self.pitch_weights = pitch_weights
 
+    # --------------------------------------------------
+    # --------------------------------------------------
 
+    def parsons_encoding(self):
+        parson_melodies = []
+        for m in self.melodies_intervals:
+            pars = ["*"]
+            for n in m:
+                if n < 0:
+                    pars.append("d")
+                elif n == 0:
+                    pars.append("r")
+                else:
+                    pars.append("u")
+            parson_melodies.append(pars)
 
+    # --------------------------------------------------
+    # --------------------------------------------------
 
+    def melody_reduction(self, ratio):
 
-    def melody_reduction(self):
+        """
+        calculate interval salience, pitch stability, beat strength and durational accent
+        for each note. These values are then combined in order to calculate a melodic
+        weight for each note
+
+        using a threshold value, reduce melody based on weight of each not
+        threshold parameter can be used to adjust sensitivity of reduction
+        """
+        original_count = 0
         for melody_index, melody in enumerate(self.melodies):
+            m = []
             for note_index, note in enumerate(melody):
-
                 # get interval salience
                 if note_index == 0:
                     interval_salience = 0
-
                 else:
-                    interval_salience = self.melodies_intervals[melody_index][note_index - 1]
+                    interval_salience = np.abs(self.melodies_intervals[melody_index][note_index - 1])
 
-                pitch_stability = self.weighted_melodies[melody_index][note_index]
+                # RENAME PITCH STABILITY
+                pitch_stability = self.pitch_weights[melody_index][note_index]
+
+
                 beat_strength = note.beatStrength
                 durational_accent = note.duration.quarterLength
-                weighted = self.WeightedNote(note.pitch, interval_salience, pitch_stability, beat_strength, durational_accent)
-                print(weighted.weight)
+                weight = interval_salience + pitch_stability + beat_strength + durational_accent
+                m.append(weight)
+
+                original_count += 1
+
+            self.weighted_melodies.append(m)
+
+        new_count = original_count
+
+        # here reduce by a compression ratio -> eg. 0.5
+        for i in range(20):
+            threshold = i * 0.25
+            temporary_reduction = []
+            for index, mel in enumerate(self.weighted_melodies):
+                m2 = []
+                for j, w in enumerate(mel):
+
+                    if w < threshold:
+                        m2.append(music21.note.Rest(quarterLength=self.melodies[index][j].duration.quarterLength))
+                        original_count -= 1
+                    else:
+                        m2.append(self.melodies[index][j])
+
+                temporary_reduction.append(m2)
+
+            if -0.1 < (new_count / original_count) - ratio < 0.1:
+                self.reduced_melodies = temporary_reduction
+                return
+
+    # --------------------------------------------------
+    # --------------------------------------------------
+
+    def normalize_reduction(self):
+        norm = []
+        for m in self.reduced_melodies:
+            if len(m) > 1:
+                temp = []
+                for n in range(len(m) - 1):
+                    temp.append(m[n+1].pitch.midi - m[n].pitch.midi)
+                norm.append(temp)
+            else:
+                norm.append([0])
+        self.normalized_reduction = norm
+        return
 
 
+    # --------------------------------------------------
+    # --------------------------------------------------
+
+    def reconstruct(self):
+        """
+        Reconstructs the melody and chord structure
+        Works by recursing through the notes of the original score
+        and replacing the notes with the reduced melody
+        indexed by a counter
+        """
+
+        score = [n for n in self.score_parsed.recurse().notesAndRests]
+        flat_melody = [n for m in self.reduced_melodies for n in m]
+        for index, note in enumerate(score):
+            if type(note) is music21.note.Note and type(note) is not music21.note.Rest:
+                if flat_melody:
+                    n = flat_melody.pop(0)
+                else:
+                    n = music21.note.Rest(quarterLength=note.duration.quarterLength)
+                score[index] = n
+
+        S = stream.Score()
+        for i in score:
+            S.append(i)
+        self.reduced_stream = S
+
+    # --------------------------------------------------
+    # --------------------------------------------------
+
+leadsheets = []
+chord_dict = {}
+
+chord_profile = []
+chord_pitch_class = []
+chord_common_names = []
+melody_intervals = []
+melody_pitched = []
 
 
-# def chord_progression_extractor(progression, key):
-#     # return [roman.romanNumeralFromChord(i, key).figure for i in progression]
-#     return [roman.romanNumeralFromChord(i, key).romanNumeralAlone for i in progression]
+def main():
+    # main processing section
+    for i in range(100):
+        path = paths[i]
+        path = "EWLD/" + path[0]
+        sheet = Leadsheet(path)
 
-# def get_key(sheet):
-#     for i in (sheet.score_parsed.recurse()):
-#         if type(i) == music21.key.KeySignature:
-#             print(i)
+        # THIS IS IN PLACE FOR A REASON:
+        # ERRORS OCCUR WITH NO TIME SIG ENCODING
+        # CANNOT CALCULATE BEAT STRENGTH
+        if len(sheet.score_parsed.recurse().getElementsByClass(meter.TimeSignature)) == 0:
+            continue
 
-def stringify(val):
-    return ','.join([str(x) for x in val])
+        sheet.chord_melody_separation()
+        sheet.chord_feature_extraction()
+        sheet.melody_pitch_encoding()
+        sheet.melody_interval_encoding()
 
+        sheet.weighted_pitch_encoding()
+        sheet.melody_reduction(threshold=0.5)
+
+        chord_profile.append(sheet.chord_profile)
+        chord_pitch_class.append(sheet.chord_pitch_class)
+        chord_common_names.append(sheet.chord_pitched_names)
+        melody_intervals.append(sheet.melodies_intervals)
+        melody_pitched.append(sheet.melodies_pitched)
+
+    # chord_intervals = flatten(chord_intervals)
+    # chord_profiles = flatten(chord_profiles)
+    # melody_intervals = flatten(melody_intervals)
+    # melody_exact = flatten(melody_exact)
+
+    # print(build_duo_corp(chord_profile, melody_intervals))
+
+main()
 
 def flatten(arr):
     return [i for j in arr for i in j]
 
 
-def update_corpus(corp, key):
-    if key in corp:
-        corp[key] += 1
-    else:
-        corp[key] = 1
-    return corp
+# KEEP THIS
+# def melodic_reduction_test():
+#     for s in range(5):
+#         path = paths[s]
+#         path = "EWLD/" + path[0]
+#         sheet = Leadsheet(path)
+#         if len(sheet.score_parsed.recurse().getElementsByClass(meter.TimeSignature)) == 0:
+#             print("no time signature")
+#             continue
+#         # sheet.score_parsed.show()
+#         sheet.chord_melody_separation()
+#         sheet.chord_feature_extraction()
+#         sheet.melody_pitch_encoding()
+#         sheet.melody_interval_encoding()
+
+#         sheet.weighted_pitch_encoding()
+
+#         n = []
+#         unique = []
+#         for i in range(5):
+
+#             sheet.melody_reduction(threshold=i)
+#             sheet.reconstruct()
+#             corp = build_corp_reduced(sheet.chord_profile, sheet.reduced_melodies)
+
+#             # plot distinct melodies for each threshold
+#             # sheet.reduced_stream.show()
+#             # input()
+#             n.append(i)
+#             total = 0
+#             for key in corp:
+#                 total += len(corp[key].keys())
+#             unique.append(total - len(corp.keys()))
+
+#         print(n)
+#         plt.plot(n, unique)
+#         plt.title(("sheet: ", s))
+#         plt.xlabel("Threshold")
+#         plt.ylabel("Unique Melodies")
+#         plt.show()
 
 
-def build_weighted_note_corpus():
-    pass
-
-def build_duo_corpi(c1, m1, c2, m2):
-
-    """
-    METHOD 1:
-
-    this corpus considers simple relation to chords and melodies, both pitched and un-pitched
-
-    for optimal use, pattern matching must be applied as exact matches are unlikely
-
-    takes in 2 pairs of chord-melody arrays and builds a 2D dictionary of melody occurrences
-    in a both pitched and un-pitched representation.
-
-    function will return the respective corpi in the order in which the pairs are passed
-    into the function
-    """
-
-    # for each of chord; build corpus of melodies, then combine to make multi-layerd dict.
-    # iteration only necessary for either c1, m1 as mapped directly to c2, m2
-    c1_lookup = dict()
-    c2_lookup = dict()
-    corp1 = []
-    corp2 = []
-
-    for index, chord in enumerate(c1):
-        chord = stringify(chord)
-
-        # if chord currently has a corpus built from it; find from lookup table
-        if chord in c1_lookup:
-            lookup_index = c1_lookup[chord]
-            m1_key = stringify(m1[index])
-            m2_key = stringify(m2[index])
-
-            corp1[lookup_index] = update_corpus(corp1[lookup_index], m1_key)
-            corp2[lookup_index] = update_corpus(corp2[lookup_index], m2_key)
-
-        # if chord does not currently have a corpus; create corp
-        else:
-
-            # create corp
-            n = len(c1_lookup)
-            c1_lookup[chord] = n
-            c2_lookup[stringify(c2[index])] = n
-            corp1.append(dict())
-            corp2.append(dict())
-
-            m1_key = stringify(m1[index])
-            m2_key = stringify(m2[index])
-
-            corp1[n] = update_corpus(corp1[n], m1_key)
-            corp2[n] = update_corpus(corp2[n], m2_key)
-
-    c1_corpus = dict()
-    c2_corpus = dict()
-    for index, key in enumerate(c1_lookup):
-        c1_corpus[key] = corp1[index]
-
-    for index, key in enumerate(c2_lookup):
-        c2_corpus[key] = corp2[index]
-
-    return c1_corpus, c2_corpus
+# melodic_reduction_test()
 
 
-leadsheets = []
-chord_dict = {}
+# def count_missing_time_sig():
+#     count = 0
+#     for path in paths:
+#         path = "EWLD/" + path[0]
+#         sheet = Leadsheet(path)
+#         if len(sheet.score_parsed.recurse().getElementsByClass(meter.TimeSignature)) == 0:
+#             count += 1
+#             print(path)
+#             print(count)
+#             continue
+#
+#     print(count)
+#
+# count_missing_time_sig()
 
-chord_intervals = []
-chord_profiles = []
-melody_intervals = []
-melody_exact = []
-
-
-# main processing section
-for i in range(10):
-    path = paths[i]
-    # print('parsing ', paths)
-    path = "EWLD/" + path[0]
-    sheet = Leadsheet(path)
-    sheet.chord_melody_separation()
-    sheet.chord_feature_extraction()
-    sheet.melody_pitch_encoding()
-    sheet.melody_interval_encoding()
-
-    sheet.weighted_pitch_encoding()
-    sheet.melody_reduction()
-
-    chord_intervals.append(sheet.chord_intervals)
-    chord_profiles.append(sheet.chord_profiles)
-
-    melody_intervals.append(sheet.melodies_intervals)
-    melody_exact.append(sheet.melodies_exact)
-
-chord_intervals = flatten(chord_intervals)
-chord_profiles = flatten(chord_profiles)
-melody_intervals = flatten(melody_intervals)
-melody_exact = flatten(melody_exact)
-
-print(build_duo_corpi(chord_intervals, melody_intervals, chord_profiles, melody_exact))
-
-# THIS SECTION FOR VISUALIZING A MUDDY DATA FIELD WITH NON-USEFUL CHORD SYMBOLS
+# # THIS SECTION FOR VISUALIZING A MUDDY DATA FIELD WITH NON-USEFUL CHORD SYMBOLS
+# main()
+# corp = build_single_corp(chord_common_names)
 # plt.bar(list(corp.keys()), list(corp.values()))
 # plt.xticks(list(corp.keys()), rotation=90)
+# plt.title("Chord Pitched Common Names")
+# plt.xlabel("chord name")
+# plt.ylabel("count")
 # plt.show()
-
+# print(len(corp.keys()))
+#
+# corp = build_single_corp(chord_pitch_class)
+# plt.bar(list(corp.keys()), list(corp.values()))
+# plt.xticks(list(corp.keys()), rotation=90)
+# plt.title("Chord Pitch Class")
+# plt.xlabel("pitch class")
+# plt.ylabel("count")
+# plt.show()
+# print(len(corp.keys()))
+#
+# corp = build_single_corp(chord_profile)
+# plt.bar(list(corp.keys()), list(corp.values()))
+# plt.xticks(list(corp.keys()), rotation=90)
+# plt.title("Chord Profile")
+# plt.xlabel("profile")
+# plt.ylabel("count")
+# plt.show()
+# print(len(corp.keys()))
 
 # # chord removal
 # for n in c.recurse().getElementsByClass(chord.Chord):

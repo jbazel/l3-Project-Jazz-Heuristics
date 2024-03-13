@@ -1,0 +1,11 @@
+
+dpython:S2208"GImport only needed names or import the module and then use its members.(€ºãˆüÿÿÿÿ
+dpython:S2208"GImport only needed names or import the module and then use its members.(×“¬˜ùÿÿÿÿ
+6python:S125z"Remove this commented out code.(àõâ
+rpython:S3776Ç"TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(Ôƒ¸®úÿÿÿÿ
+=python:S3626Œ"Remove this redundant return.(ÙãŞŸ8™ÆÑÓá1
+jpython:S930É"KAdd 1 missing arguments; 'melody_reduction' expects 1 positional arguments.(¤·µ8®‹ÙûŞ1
+Qpython:S930É"2Remove this unexpected named argument 'threshold'.(¤·µ8®‹ÙûŞ1
+Cpython:S125Ñ"Remove this commented out code.(¶¾—øÿÿÿÿÿ8®‹ÙûŞ1
+Cpython:S125‹"Remove this commented out code.(’¥Êîûÿÿÿÿ8®‹ÙûŞ1
+Cpython:S125Á"Remove this commented out code.(˜ŒÎäıÿÿÿÿ8®‹ÙûŞ1

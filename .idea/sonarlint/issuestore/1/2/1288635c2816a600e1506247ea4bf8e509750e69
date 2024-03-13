@@ -1,0 +1,7 @@
+
+Rpython:S1172"3Remove the unused function parameter "method_flag".(—®ƒŞ8«ñ¥ã1
+\python:S1481	"8Remove the unused local variable "reduced_pitched_corp".(–«’šüÿÿÿÿ8ÖÔ†¨ã1
+Lpython:S1481"-Remove the unused local variable "bar_flags".(°¼½8¬ñ¥ã1
+;python:S2772?"Remove this unneeded "pass".(ã‘Û¾8¬ñ¥ã1
+Dpython:S1481"%Remove the unused local variable "i".(°¼½8¬ñ¥ã1
+xpython:S1186A"[Add a nested comment explaining why this function is empty, or complete the implementation.(¯»šùÿÿÿÿ
