@@ -1,7 +1,26 @@
 
-Rpython:S1172"3Remove the unused function parameter "method_flag".(—®ƒŞ8«ñ¥ã1
-\python:S1481	"8Remove the unused local variable "reduced_pitched_corp".(–«’šüÿÿÿÿ8ÖÔ†¨ã1
-Lpython:S1481"-Remove the unused local variable "bar_flags".(°¼½8¬ñ¥ã1
-;python:S2772?"Remove this unneeded "pass".(ã‘Û¾8¬ñ¥ã1
-Dpython:S1481"%Remove the unused local variable "i".(°¼½8¬ñ¥ã1
-xpython:S1186A"[Add a nested comment explaining why this function is empty, or complete the implementation.(¯»šùÿÿÿÿ
+°python:S11920"kDefine a constant instead of duplicating this literal "current search gram {} has probability: {}" 4 times.(Á»®8¢ á¼å1J$6422eb0c-5570-4ced-a0c8-d5f775c7a8b8
+python:S1481":Replace the unused local variable "normal_order" with "_".(¦Ú×ï8£ á¼å1J$17d7edaa-57b9-40d7-b8d1-5288e3ec583c
+‚python:S1481"8Remove the unused local variable "reduced_pitched_corp".(–«’šüÿÿÿÿ8£ á¼å1J$3ba41c5c-a4e1-4188-bc5d-83a147d4ea79
+python:S1481"7Replace the unused local variable "reduction" with "_".(´Äµòşÿÿÿÿ8£ á¼å1J$eed8b438-fb4c-464b-8994-d4192c6a54bc
+{python:S1481"6Replace the unused local variable "numerals" with "_".(«‚È8£ á¼å1J$63b2ec66-2086-4a73-9bb7-61ff4c0e9834
+€python:S1481";Replace the unused local variable "pitch_weights" with "_".(Õ³Øà8£ á¼å1J$2efc8f1a-c917-4664-949e-9831127c8fb3
+€python:S1481"6Replace the unused local variable "melodies" with "_".(«©ìşúÿÿÿÿ8£ á¼å1J$84fc4e78-f90d-45ee-8fc5-2f26fd71e231
+python:S1481"5Replace the unused local variable "pitched" with "_".(Õôû„ûÿÿÿÿ8£ á¼å1J$92154514-7f84-49ea-8666-4af3631b2f0b
+ypython:S1481"4Replace the unused local variable "chords" with "_".(Ï§œ»8£ á¼å1J$cedb810c-312f-4675-9a59-f004142d1f45
+Špython:S1481"@Replace the unused local variable "interval_reduction" with "_".(ï•áğûÿÿÿÿ8£ á¼å1J$1a76243e-ba3c-40c1-95fc-774fe3a91998
+python:S3776"TRefactor this function to reduce its Cognitive Complexity from 48 to the 15 allowed.(È¼³¥şÿÿÿÿ8¤ á¼å1J$80da6117-d215-4e6a-aabd-c82f6d6b3231
+˜python:S1226"NIntroduce a new variable or use its initial value before reassigning 'corpus'.(È¼³¥şÿÿÿÿ8¤ á¼å1J$859b4f05-1648-45ba-94c0-bd65e014606e
+cpython:S125("Remove this commented out code.(“à‡‘8½½î¼å1J$5f8f2861-4558-402d-811f-ee5bad64285a
+cpython:S125F"Remove this commented out code.(“à‡‘8²ôî¼å1J$e0e7a8a0-e90a-4509-8ad6-c8b998120f03
+xpython:S1172n"3Remove the unused function parameter "method_flag".(—®ƒŞ8¤ á¼å1J$01b87f6a-3522-4032-88f0-6349f63dcd5c
+‚python:S1481o"8Remove the unused local variable "reduced_pitched_corp".(–«’šüÿÿÿÿ8¤ á¼å1J$31eeb814-0385-4c59-a893-316ec61c0359
+€python:S1481x";Replace the unused local variable "pitch_weights" with "_".(Õ³Øà8¤ á¼å1J$b8f8caaa-b218-469d-a00b-eb6eee9f9a06
+|python:S1481w"7Replace the unused local variable "intervals" with "_".(©õ©­8¤ á¼å1J$ced34841-67d5-4730-b60d-40dab0c98410
+python:S1481v"5Replace the unused local variable "pitched" with "_".(Õôû„ûÿÿÿÿ8¤ á¼å1J$64b62ddc-cd4c-4a19-b55b-73264e211359
+ypython:S1481r"4Replace the unused local variable "chords" with "_".(Ï§œ»8¤ á¼å1J$39e7ca90-5e42-471f-9818-19e2b504930e
+€python:S1481s"6Replace the unused local variable "melodies" with "_".(«©ìşúÿÿÿÿ8¤ á¼å1J$c178b292-d2ed-4f3e-bad3-659c1fc9f97b
+rpython:S1481|"-Remove the unused local variable "bar_flags".(°¼½8¤ á¼å1J$49470bf6-188d-4dd5-abb3-372671e0a3d1
+python:S1481t":Replace the unused local variable "normal_order" with "_".(¦Ú×ï8¤ á¼å1J$95a0b682-d1b4-462f-94d7-33eb6eb92aae
+ppython:S1481|"+Replace the unused loop index "i" with "_".(°¼½8¤ á¼å1J$c782311d-d621-4136-beb9-edf768d464ce
+¦python:S1186"[Add a nested comment explaining why this function is empty, or complete the implementation.(¯»šùÿÿÿÿ8¤ á¼å1J$411ec374-1ba8-4991-a186-c9a9ba334551

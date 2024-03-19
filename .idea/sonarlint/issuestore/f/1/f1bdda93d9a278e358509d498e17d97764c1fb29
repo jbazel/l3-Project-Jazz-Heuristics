@@ -1,11 +1,11 @@
 
-dpython:S2208"GImport only needed names or import the module and then use its members.(€ºãˆüÿÿÿÿ
-dpython:S2208"GImport only needed names or import the module and then use its members.(×“¬˜ùÿÿÿÿ
-6python:S125z"Remove this commented out code.(àõâ
-rpython:S3776Ç"TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(Ôƒ¸®úÿÿÿÿ
-=python:S3626Œ"Remove this redundant return.(ÙãŞŸ8™ÆÑÓá1
-jpython:S930É"KAdd 1 missing arguments; 'melody_reduction' expects 1 positional arguments.(¤·µ8®‹ÙûŞ1
-Qpython:S930É"2Remove this unexpected named argument 'threshold'.(¤·µ8®‹ÙûŞ1
-Cpython:S125Ñ"Remove this commented out code.(¶¾—øÿÿÿÿÿ8®‹ÙûŞ1
-Cpython:S125‹"Remove this commented out code.(’¥Êîûÿÿÿÿ8®‹ÙûŞ1
-Cpython:S125Á"Remove this commented out code.(˜ŒÎäıÿÿÿÿ8®‹ÙûŞ1
+Špython:S2208"GImport only needed names or import the module and then use its members.(€ºãˆüÿÿÿÿJ$2c1e1590-a94f-4d8c-9a37-31108d43e79d
+Špython:S2208"GImport only needed names or import the module and then use its members.(×“¬˜ùÿÿÿÿJ$8614af73-d9f9-4a7d-aa44-6ba2ead0faf1
+\python:S125z"Remove this commented out code.(àõâJ$360f565f-d5d9-4796-a391-8b6bfb705eb9
+˜python:S3776Ç"TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(Ôƒ¸®úÿÿÿÿJ$ddff92be-13b2-450d-be0d-8386d55efc34
+cpython:S3626Œ"Remove this redundant return.(ÙãŞŸ8™ÆÑÓá1J$77208ae1-f592-4781-aa72-87cebe4a25cb
+python:S930É"KAdd 1 missing arguments; 'melody_reduction' expects 1 positional arguments.(¤·µ8®‹ÙûŞ1J$2cf0d5af-be14-4a9c-9bd8-79b989bb36ff
+wpython:S930É"2Remove this unexpected named argument 'threshold'.(¤·µ8®‹ÙûŞ1J$b84ff482-d4dd-4e9e-a100-8df894e0b08b
+ipython:S125Ñ"Remove this commented out code.(¶¾—øÿÿÿÿÿ8®‹ÙûŞ1J$4a113b64-ea0f-4a6c-8ab9-b7ccb866c011
+ipython:S125‹"Remove this commented out code.(’¥Êîûÿÿÿÿ8®‹ÙûŞ1J$698e7ad0-0e1d-4044-8841-b60ee3734fa7
+ipython:S125Á"Remove this commented out code.(˜ŒÎäıÿÿÿÿ8®‹ÙûŞ1J$3a4c2f14-809a-4c8d-8aaf-ccfb6d89e7f3

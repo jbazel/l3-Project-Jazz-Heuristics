@@ -33,13 +33,13 @@ def update_pitch_vec(chords, melodies, corp):
         c = stringify(c)
         if c not in corp:
             corp[c] = dict()
-        for m in melodies[index]:
-            for n in m:
-                pitch = n.pitch.midi
-                if pitch in corp[c]:
-                    corp[c][pitch] += n.quarterLength
-                else:
-                    corp[c][pitch] = n.quarterLength
+        for n in melodies[index]:
+            pitch = n.pitch.midi
+            if pitch in corp[c]:
+                corp[c][pitch] += n.quarterLength
+            else:
+                corp[c][pitch] = n.quarterLength
+    return corp
 
 
 def melody_pitch_encoding(melodies):

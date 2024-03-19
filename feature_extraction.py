@@ -3,6 +3,7 @@ import numpy as np
 
 CONS_VEC = [1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0]
 
+
 def chord_melody_separation(score):
     melodies = []
     score = [n for n in score.recurse().notes]
@@ -15,11 +16,12 @@ def chord_melody_separation(score):
     return chords, melodies
 
 
-def chord_extract(chords):
+def chord_extract(chords, key):
     # normal orders of chords
     normal_orders = []
     # chords rotated to pitch class 0
     pc0 = []
+    numerals = []
     for c in chords:
         norm = c.normalOrder
         fp = norm[0]
@@ -27,16 +29,13 @@ def chord_extract(chords):
         normal_orders.append(norm)
         pc0.append(rotate)
 
-        # generate GCT
-        # print(c.romanNumeral(key))
+        #  generate GCT
+        numeral = music21.roman.romanNumeralFromChord(c, key)
+        # print(numeral.figure)
+        numerals.append(numeral.figure)
 
+    return normal_orders, pc0, numerals
 
-
-
-
-
-
-    return normal_orders, pc0
 
 def melody_extract(melodies):
     pitched = []
@@ -74,6 +73,7 @@ def pitchweight_extract(melodies):
             wm.append(note_dict[n.pitch.midi])
         weighted.append(wm)
     return weighted
+
 
 def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.7):
     reduced = False
@@ -128,10 +128,11 @@ def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.7):
 
 
 def extract(score):
+    key = score.analyze('key')
     chords, melodies = chord_melody_separation(score)
-    normal_order, pc0 = chord_extract(chords)
+    normal_order, pc0, numerals = chord_extract(chords, key)
     pitched, intervals = melody_extract(melodies)
     pitch_weights = pitchweight_extract(melodies)
-    reduction, interval_reduction = melodic_reduction(melodies, pitched, intervals,  pitch_weights)
+    reduction, interval_reduction = melodic_reduction(melodies, pitched, intervals, pitch_weights)
 
-    return chords, melodies, normal_order, pc0, pitched, intervals, pitch_weights, reduction, interval_reduction
+    return chords, melodies, normal_order, pc0, numerals, pitched, intervals, pitch_weights, reduction, interval_reduction
