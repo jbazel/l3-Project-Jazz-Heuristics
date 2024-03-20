@@ -10,7 +10,7 @@ from chord_corpus_builder import build_duo_corp, build_single_corp, update_duo_c
 # us['musicxmlPath'] = '../../../../../Applications/MuseScore 3.app'
 # us['midiPath'] = '../../../../../Applications/GarageBand.app'
 
-from search import search
+from search import three_gram_search
 
 db = sqlite3.connect('EWLD/EWLD.db')
 cursor = db.cursor()

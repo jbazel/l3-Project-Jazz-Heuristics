@@ -132,5 +132,5 @@ def convert_corpus_to_probabilities(corp):
     for key in corp:
         total = sum(corp[key].values())
         for sub_key in corp[key]:
-            corp[key][sub_key] = corp[key][sub_key] / total
+            corp[key][sub_key] = float(corp[key][sub_key] / total)
     return corp

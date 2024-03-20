@@ -10,10 +10,10 @@ def stringify(val):
     return ','.join([str(x) for x in val])
 
 
-def three_gram_search(score, corpus, note_probabilities):
-    reduced_pitched_corp = json.load(open("corpi/reduced_pitched_corpus.json"))
-    reduced_relative_corp = json.load(open("corpi/reduced_relative_corpus.json"))
-    corpus = reduced_relative_corp
+def three_gram_search(score, corpus, note_probabilities, flag):
+    # flag = 0 for pitched, flag = 1 for unpitched
+    #
+    #
     chords, \
         melodies, \
         normal_order, \
@@ -25,13 +25,25 @@ def three_gram_search(score, corpus, note_probabilities):
         reduction, \
         interval_reduction = extract(score)
 
+    if flag == 0:
+        chord_set = normal_order
+        melody_set = pitched
+
+    elif flag == 1:
+        chord_set = numerals
+        melody_set = intervals
+
+    else:
+        print("ERROR: Invalid flag")
+        return
+
     probs = []
-    for index, m in enumerate(intervals):
+    for index, m in enumerate(melody_set):
         length = len(m)
         if length > 3:
             for i in range(length - 2):
                 search_gram = m[i:i + 3]
-                current_chord = pc0[index]
+                current_chord = chord_set[index]
                 current_chord = stringify(current_chord)
                 if current_chord in corpus:
                     mindx = 100000
@@ -49,8 +61,11 @@ def three_gram_search(score, corpus, note_probabilities):
 
                 else:
                     average_note_prob = 0
-                    for note in search_gram:
-                        average_note_prob += note_probabilities[current_chord][note]
+                    chord_key = stringify(normal_order[index])
+                    for note in pitched[index]:
+                        note = str(note)
+                        if note in note_probabilities[chord_key]:
+                            average_note_prob += note_probabilities[chord_key][note]
                     average_note_prob /= len(search_gram)
                     prob = average_note_prob
                     print("current search gram {} has probability: {}".format(search_gram, prob))
@@ -60,7 +75,7 @@ def three_gram_search(score, corpus, note_probabilities):
             if not m:
                 continue
             search_gram = m
-            current_chord = pc0[index]
+            current_chord = chord_set[index]
             current_chord = stringify(current_chord)
 
             if current_chord in corpus:
@@ -80,8 +95,12 @@ def three_gram_search(score, corpus, note_probabilities):
 
             else:
                 average_note_prob = 0
-                for note in search_gram:
-                    average_note_prob += note_probabilities[current_chord][note]
+                chord_key = stringify(normal_order[index])
+
+                for note in pitched[index]:
+                    note = str(note)
+                    if note in note_probabilities[chord_key]:
+                        average_note_prob += note_probabilities[chord_key][note]
                 average_note_prob /= len(search_gram)
                 prob = average_note_prob
                 print("current search gram {} has probability: {}".format(search_gram, prob))
@@ -100,44 +119,8 @@ def analyse_prob_dist(dist):
         print("Z-score for {} is: {}".format(dist[i][0], z_scores[i]))
 
 
-probs = three_gram_search(
-    music21.converter.parse("EWLD/dataset/Adam_Anders-Nikki_Hassman-Peer_Åström/If_Only/If_Only.mxl"), None, None)
-print(probs)
+score = music21.converter.parse('EWLD/dataset/Adam_Anders-Nikki_Hassman-Peer_Åström/If_Only/If_Only.mxl')
+probs_pitched = three_gram_search(score, json.load(open('corpi/reduced_pitched_corpus.json')), json.load(open('corpi/pitch_vec.json')), 0)
+probs_unpitched = three_gram_search(score, json.load(open('corpi/reduced_relative_corpus.json')), json.load(open('corpi/pitch_vec.json')), 1)
 
-analyse_prob_dist(probs)
-
-
-def search(score, method_flag=0):
-    reduced_pitched_corp = json.load(open("corpi/reduced_pitched_corpus.json"))
-    reduced_relative_corp = json.load(open("corpi/reduced_relative_corpus.json"))
-    corpus = reduced_relative_corp
-    chords, \
-        melodies, \
-        normal_order, \
-        pc0, \
-        pitched, \
-        intervals, \
-        pitch_weights, \
-        reduction, \
-        interval_reduction = extract(score)
-
-    bar_flags = [False for i in range(len(reduction))]
-
-    for i, m in enumerate(interval_reduction):
-        prob = 0
-        min_edit = 100000
-        chord = pc0[i]
-        if chord in corpus:
-            current = corpus[chord]
-            for comparison_melody in current.keys:
-                # distance is levenstein
-                edit = edit_distance(reduction[i], comparison_melody)
-                if edit < min_edit:
-                    min_edit = edit
-                    prob = current[comparison_melody]
-
-        print(prob)
-
-
-def search_witout_chord(search_melody, corpus):
-    pass
+analyse_prob_dist(probs_pitched)
