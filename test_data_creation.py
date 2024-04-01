@@ -4,14 +4,21 @@ import random
 import json
 from feature_extraction import extract
 from search import three_gram_search
-
+import sqlite3
 
 # error_amnt is a float value representing what proporition of the notes to "error"
 # goal is to shift notes off by a random amount -> this will not always provide an error that is "off key"
 # but will give a fair representation of what an omr algorithms error could produce
 #
 
+db = sqlite3.connect('EWLD/EWLD.db')
+cursor = db.cursor()
+cursor.execute(
+    'SELECT DISTINCT t.path_leadsheet FROM works t INNER JOIN work_genres w ON t.id = w.id WHERE w.genre = "Jazz"')
+paths = cursor.fetchall()
+n = int(len(paths) -len(paths) / 5)
 
+paths = paths[n:]
 
 def add_errors(score, err_amnt, file_name):
     chords, \
@@ -49,8 +56,15 @@ def add_errors(score, err_amnt, file_name):
     for m in pitched:
         intervals.append([m[i + 1] - m[i] for i in range(len(m) - 1)])
 
-    # now we need to recompute the reduction
+    with open(file_name, "w+") as f:
+        json.dump({"pitched": pitched, "intervals": intervals, "normal_order": normal_order, "pc0": pc0, "flags": flags}, f)
 
-    three_gram_search(pitched, intervals, pitch_weights, True, pc0, intervals)
-
-add_errors(music21.converter.parse('EWLD/dataset/Adam_Anders-Nikki_Hassman-Peer_Åström/If_Only/If_Only.mxl'), 0.4, 'test_data/1.xml')
+counter = 0
+for path in paths:
+    counter+=1
+    path = "EWLD/" + path[0]
+    score = music21.converter.parse(path)
+    # if len(score.recurse().getElementsByClass(meter.TimeSignature)) == 0:
+    #     print("ERROR: Invalid Time Signature - Skipping")
+    #     continue
+    add_errors(score, 0.4, "test_files/" + str(counter) + ".json")
