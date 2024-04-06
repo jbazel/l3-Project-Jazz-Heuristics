@@ -1,11 +1,18 @@
 
-Špython:S1192<"kDefine a constant instead of duplicating this literal "current search gram {} has probability: {}" 4 times.(Á»®8ØôŸåå1
-Zpython:S1481"6Replace the unused local variable "melodies" with "_".(«©ìþúÿÿÿÿ8ÚôŸåå1
-Zpython:S1481";Replace the unused local variable "pitch_weights" with "_".(Õ³Øà8ÚôŸåå1
-Upython:S1481"1Replace the unused local variable "pc0" with "_".(²ëÒ³øÿÿÿÿ8ÚôŸåå1
-dpython:S1481"@Replace the unused local variable "interval_reduction" with "_".(ï•áðûÿÿÿÿ8ÚôŸåå1
-[python:S1481"7Replace the unused local variable "reduction" with "_".(´Äµòþÿÿÿÿ8ÚôŸåå1
-Spython:S1481"4Replace the unused local variable "chords" with "_".(Ï§œ»8ÚôŸåå1
-™python:S3776"TRefactor this function to reduce its Cognitive Complexity from 51 to the 15 allowed.(ÀðìÝ8¤ á¼å1J$1f4e9a38-d6d8-408e-91ac-28046a03189a
-=python:S1254"Remove this commented out code.(“à‡‘8ßôŸåå1
-=python:S125S"Remove this commented out code.(“à‡‘8ßôŸåå1
+Špython:S11929"kDefine a constant instead of duplicating this literal "current search gram {} has probability: {}" 4 times.(Á»®8ØôŸåå1
+Upython:S1481"1Replace the unused local variable "pc0" with "_".(²ëÒ³øÿÿÿÿ8ÚôŸåå1
+Spython:S1481"4Replace the unused local variable "chords" with "_".(Ï§œ»8ÚôŸåå1
+Zpython:S1481"6Replace the unused local variable "melodies" with "_".(«©ìþúÿÿÿÿ8ÚôŸåå1
+dpython:S1481"@Replace the unused local variable "interval_reduction" with "_".(ï•áðûÿÿÿÿ8ÚôŸåå1
+[python:S1481"7Replace the unused local variable "reduction" with "_".(´Äµòþÿÿÿÿ8ÚôŸåå1
+Zpython:S1481";Replace the unused local variable "pitch_weights" with "_".(Õ³Øà8ÚôŸåå1
+™python:S3776"TRefactor this function to reduce its Cognitive Complexity from 62 to the 15 allowed.(ÀðìÝ8¤ á¼å1J$1f4e9a38-d6d8-408e-91ac-28046a03189a
+=python:S1251"Remove this commented out code.(“à‡‘8ßôŸåå1
+=python:S125R"Remove this commented out code.(“à‡‘8ßôŸåå1
+Opython:S1172n"+Remove the unused function parameter "pc0".(Á¡õ¾ùÿÿÿÿ8ððñê1
+xpython:S3776n"TRefactor this function to reduce its Cognitive Complexity from 75 to the 15 allowed.(Á¡õ¾ùÿÿÿÿ8‰ððñê1
+=python:S125o"Remove this commented out code.(ÌîýÉ8‰ððñê1
+>python:S125”"Remove this commented out code.(“à‡‘8Šððñê1
+>python:S125¶"Remove this commented out code.(“à‡‘8Šððñê1
+>python:S125æ"Remove this commented out code.(îé¤…8Šððñê1
+Cpython:S125ê"Remove this commented out code.(¤±šÕÿÿÿÿÿ8Šððñê1

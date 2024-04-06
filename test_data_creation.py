@@ -16,7 +16,7 @@ cursor = db.cursor()
 cursor.execute(
     'SELECT DISTINCT t.path_leadsheet FROM works t INNER JOIN work_genres w ON t.id = w.id WHERE w.genre = "Jazz"')
 paths = cursor.fetchall()
-n = int(len(paths) -len(paths) / 5)
+n = int(len(paths) -len(paths) / 10)
 
 paths = paths[n:]
 
@@ -46,9 +46,9 @@ def add_errors(score, err_amnt, file_name):
             if random.random() < err_amnt:
                 n += random.choice([-1, 1])  # add a random amount to the note
                 pitched[melody_ind][note_ind] = n
-                temp.append(False)
+                temp.append(1)
             else:
-                temp.append(True)
+                temp.append(0)
         flags.append(temp)
 
     # next recompute the intervals

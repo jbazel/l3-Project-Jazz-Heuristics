@@ -1,0 +1,10 @@
+
+Spython:S1481";Replace the unused local variable "pitch_weights" with "_".(Õ³Øà
+Npython:S1481"6Replace the unused local variable "numerals" with "_".(«‚È
+Spython:S1481"6Replace the unused local variable "melodies" with "_".(«©ìşúÿÿÿÿ
+Dpython:S1481'"-Remove the unused local variable "len_notes".(äÉÔX
+Dpython:S1481%"'Remove the unused local variable "key".(àÂ¥æøÿÿÿÿ
+]python:S1481!"@Replace the unused local variable "interval_reduction" with "_".(ï•áğûÿÿÿÿ
+Lpython:S1481"4Replace the unused local variable "chords" with "_".(Ï§œ»
+Tpython:S1481 "7Replace the unused local variable "reduction" with "_".(´Äµòşÿÿÿÿ
+6python:S125C"Remove this commented out code.(” Ÿ·

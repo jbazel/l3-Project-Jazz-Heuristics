@@ -46,13 +46,12 @@ def three_gram_search(score, corpus, note_probabilities, flag):
                     mindx = 100000
                     for comparison_gram in corpus[current_chord].keys():
                         dx = edit_distance(search_gram, comparison_gram)
-                        # if dx != 0:
-                        #     prob = corpus[current_chord][comparison_gram] * (1 - (0.1 / dx))
-                        # else:
-                        #     prob = corpus[current_chord][comparison_gram]
                         if dx < mindx:
                             mindx = dx
-                            prob = corpus[current_chord][comparison_gram]
+                            if dx != 0:
+                                prob = corpus[current_chord][comparison_gram] * (1 - (0.01 / dx))
+                            else :
+                                prob = corpus[current_chord][comparison_gram]
 
                     print("current search gram {} has probability: {}".format(search_gram, prob))
 
@@ -108,23 +107,25 @@ def three_gram_search(score, corpus, note_probabilities, flag):
 
 
 def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_probabilities, flag):
-    chords, \
-        melodies, \
-        normal_order, \
-        pc0, \
-        numerals, \
-        pitched, \
-        intervals, \
-        pitch_weights, \
-        reduction, \
-        interval_reduction = extract(score)
+    # chords, \
+    #     melodies, \
+    #     normal_order, \
+    #     pc0, \
+    #     numerals, \
+    #     pitched, \
+    #     intervals, \
+    #     pitch_weights, \
+    #     reduction, \
+    #     interval_reduction = extract(score)
 
     if flag == 0:
         chord_set = normal_order
         melody_set = pitched
 
     elif flag == 1:
-        chord_set = numerals
+        # potentially change this back
+        # chord_set = numerals
+        chord_set = normal_order
         melody_set = intervals
 
     else:
@@ -143,26 +144,26 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
                     mindx = 100000
                     for comparison_gram in corpus[current_chord].keys():
                         dx = edit_distance(search_gram, comparison_gram)
-                        # if dx != 0:
-                        #     prob = corpus[current_chord][comparison_gram] * (1 - (0.1 / dx))
-                        # else:
-                        #     prob = corpus[current_chord][comparison_gram]
                         if dx < mindx:
                             mindx = dx
-                            prob = corpus[current_chord][comparison_gram]
+                            if dx != 0:
+                                prob = corpus[current_chord][comparison_gram] * (1 - (0.01 / dx))
+                            else :
+                                prob = corpus[current_chord][comparison_gram]
 
-                    print("current search gram {} has probability: {}".format(search_gram, prob))
+                    # print("current search gram {} has probability: {}".format(search_gram, prob))
 
                 else:
                     average_note_prob = 0
                     chord_key = stringify(normal_order[index])
                     for note in pitched[index]:
                         note = str(note)
-                        if note in note_probabilities[chord_key]:
-                            average_note_prob += note_probabilities[chord_key][note]
+                        if chord_key in note_probabilities:
+                            if note in note_probabilities[chord_key]:
+                                average_note_prob += note_probabilities[chord_key][note]
                     average_note_prob /= len(search_gram)
                     prob = average_note_prob
-                    print("current search gram {} has probability: {}".format(search_gram, prob))
+                    # print("current search gram {} has probability: {}".format(search_gram, prob))
             probs.append([search_gram, prob])
 
         else:
@@ -185,7 +186,7 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
                         mindx = dx
                         prob = corpus[current_chord][comparison_gram]
 
-                print("current search gram {} has probability: {}".format(search_gram, prob))
+                # print("current search gram {} has probability: {}".format(search_gram, prob))
 
             else:
                 average_note_prob = 0
@@ -193,40 +194,40 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
 
                 for note in pitched[index]:
                     note = str(note)
-                    if note in note_probabilities[chord_key]:
-                        average_note_prob += note_probabilities[chord_key][note]
+                    if chord_key in note_probabilities:
+                        if note in note_probabilities[chord_key]:
+                            average_note_prob += note_probabilities[chord_key][note]
                 average_note_prob /= len(search_gram)
                 prob = average_note_prob
-                print("current search gram {} has probability: {}".format(search_gram, prob))
+                # print("current search gram {} has probability: {}".format(search_gram, prob))
 
             probs.append([search_gram, prob])
 
-    return probs, len(pitched)
+    return probs, sum(len(x) for x in pitched)
 
-def analyse_prob_dist(dist, num_notes):
+def analyse_prob_dist(dist, num_notes, thresh =3):
+
     probs = [x[1] for x in dist]
+
     mean = statistics.mean(probs)
-    variance = statistics.variance(probs)
+    if len(probs) > 1:
+        variance = statistics.variance(probs)
+    else:
+        variance = 0.0001
     z_scores = [(x - mean) / variance for x in probs]
-
-
     flags = [0]*num_notes
+    # print(z_scores)
     for i in range(len(z_scores)):
-        if z_scores[i] > 30:
-            for j in range(len(dist[0])):
+        if z_scores[i] < -thresh:
+            for j in range(len(dist[i][0])):
                 flags[i+j] += 1
 
-
-    # for i in range(len(dist)):
-    #     print("Z-score for {} is: {}".format(dist[i][0], z_scores[i]))
-
-    print(flags)
     return flags
 
 
-score = music21.converter.parse('EWLD/dataset/Adam_Anders-Nikki_Hassman-Peer_Åström/If_Only/If_Only.mxl')
-probs_pitched, n = three_gram_search(score, json.load(open('corpi/reduced_pitched_corpus.json')), json.load(open('corpi/pitch_vec.json')), 0)
-probs_unpitched, n = three_gram_search(score, json.load(open('corpi/reduced_relative_corpus.json')), json.load(open('corpi/pitch_vec.json')), 1)
+# score = music21.converter.parse('EWLD/dataset/Adam_Anders-Nikki_Hassman-Peer_Åström/If_Only/If_Only.mxl')
+# probs_pitched, n = three_gram_search(score, json.load(open('corpi/reduced_pitched_corpus.json')), json.load(open('corpi/pitch_vec.json')), 0)
+# probs_unpitched, n = three_gram_search(score, json.load(open('corpi/reduced_relative_corpus.json')), json.load(open('corpi/pitch_vec.json')), 1)
 
-analyse_prob_dist(probs_pitched, n)
-analyse_prob_dist(probs_unpitched, n)
+# analyse_prob_dist(probs_pitched, n)
+# analyse_prob_dist(probs_unpitched, n)

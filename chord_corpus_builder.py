@@ -1,16 +1,6 @@
 
 import numpy as np
 import music21
-# NOTES = {
-#     "C--": -1, "C-": 0, "C": 1, "C#": 2, "C##": 3,
-#     "D--": 1, "D-": 2, "D": 3, "D#": 4, "D##": 5,
-#     "E--": 3, "E-": 4, "E": 5, "E#": 6, "E##": 7,
-#     "F--": 4, "F-": 5, "F": 6, "F#": 7, "F##": 8,
-#     "G--": 6, "G-": 7, "G": 8, "G#": 9, "G##": 10,
-#     "A--": 8, "A-": 9, "A": 10, "A#": 11, "A##": 12,
-#     "B--": 10, "B-": 11, "B": 12, "B#": 1, "B##": 2,
-# }
-
 
 def stringify(val):
     return ','.join([str(x) for x in val])
@@ -25,6 +15,19 @@ def update_corpus(corp, key):
         corp[key] += 1
     else:
         corp[key] = 1
+    return corp
+
+def update_key_vec(key, melodies, corp):
+    if key not in corp:
+        corp[key] = dict()
+
+    for m in melodies:
+        for n in m:
+            pitch = n.pitch.midi
+            if pitch in corp[key]:
+                corp[key][pitch] += n.quarterLength
+            else:
+                corp[key][pitch] = n.quarterLength
     return corp
 
 
