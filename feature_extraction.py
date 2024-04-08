@@ -1,4 +1,5 @@
 import music21
+from music21 import stream
 import numpy as np
 from sklearn import preprocessing
 from utils import flatten
@@ -77,7 +78,7 @@ def pitchweight_extract(melodies):
     return weighted
 
 
-def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.75):
+def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.25):
     reduced = False
     original = 0
 
@@ -162,10 +163,13 @@ def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.75):
         duration_arr[i] = duration_arr[i].tolist()
 
         reduction_weights[i] = np.add(reduction_weights[i], salience_arr[i])
+        reduction_weights[i] = np.add(reduction_weights[i], pitch_stab_arr[i])
+        reduction_weights[i] = np.add(reduction_weights[i], beat_strength_arr[i])
+        reduction_weights[i] = np.add(reduction_weights[i], duration_arr[i])
 
 
-    for t in range(200):
-        thresh = t * 0.025
+    for t in range(400):
+        thresh = t * 0.01
         temp = []
         new_count = 0
         for i, m in enumerate(reduction_weights):
@@ -176,8 +180,8 @@ def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.75):
                     new_count += 1
             temp.append(rm)
 
-        r = np.abs((new_count / original) - ratio)
-        if r < 0.05:
+        r = (new_count / original)
+        if r < ratio:
             reduced = True
             break
 
@@ -185,6 +189,8 @@ def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.75):
         reduction = temp
 
     else:
+
+
         reduction = pitched
 
     intervals = []
@@ -192,6 +198,130 @@ def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.75):
         intervals.append([m[i + 1] - m[i] for i in range(len(m) - 1)])
 
     return reduction, intervals
+
+
+def melodic_reduction_test(melodies, pitched, intervals, pitch_weights, ratio=0.25):
+    reduced = False
+    original = 0
+
+    salience_arr = []
+    pitch_stab_arr = []
+    beat_strength_arr = []
+    duration_arr = []
+
+    # calculate individual note-weights
+    for i, m in enumerate(melodies):
+        w = []
+        reduction_weights = []
+        saliences = []
+        pitch_stabs = []
+        beat_strengths = []
+        durations = []
+        for j, n in enumerate(m):
+            if j == 0:
+                interval_salience = 0
+            else:
+                interval_salience = np.abs(intervals[i][j - 1])
+
+            pitch_stability = pitch_weights[i][j]
+            beat_strength = n.beatStrength
+            duration = n.duration.quarterLength
+
+            saliences.append(interval_salience)
+            pitch_stabs.append(pitch_stability)
+            beat_strengths.append(beat_strength)
+            durations.append(duration)
+
+            original += 1
+
+        # saliences = np.array(saliences)
+        # pitch_stabs = np.array(pitch_stabs)
+        # beat_strengths = np.array(beat_strengths)
+        # durations = np.array(durations)
+
+        salience_arr.append(saliences)
+        pitch_stab_arr.append(pitch_stabs)
+        beat_strength_arr.append(beat_strengths)
+        duration_arr.append(durations)
+
+
+    flat_salience_arr = flatten(salience_arr)
+    flat_pitch_stab_arr = flatten(pitch_stab_arr)
+    flat_beat_strength_arr = flatten(beat_strength_arr)
+    flat_duration_arr = flatten(duration_arr)
+    # normalize all arrays to [0, 1]
+
+
+    min_sal = np.min(flat_salience_arr)
+    max_sal = np.max(flat_salience_arr)
+
+    min_stab = np.min(flat_pitch_stab_arr)
+    max_stab = np.max(flat_pitch_stab_arr)
+
+    min_bs = np.min(flat_beat_strength_arr)
+    max_bs = np.max(flat_beat_strength_arr)
+
+    min_d = np.min(flat_duration_arr)
+    max_d = np.max(flat_duration_arr)
+
+    for i in range(len(salience_arr)):
+        salience_arr[i] = np.array(salience_arr[i])
+        salience_arr[i] = (salience_arr[i] - min_sal) / (max_sal - min_sal)
+
+        pitch_stab_arr[i] = np.array(pitch_stab_arr[i])
+        pitch_stab_arr[i] = (pitch_stab_arr[i] - min_stab) / (max_stab - min_stab)
+
+        beat_strength_arr[i] = np.array(beat_strength_arr[i])
+        beat_strength_arr[i] = (beat_strength_arr[i] - min_bs) / (max_bs - min_bs)
+
+        duration_arr[i] = np.array(duration_arr[i])
+        duration_arr[i] = (duration_arr[i] - min_d) / (max_d - min_d)
+
+    reduction_weights = [0] * len(salience_arr)
+    for i in range(len(salience_arr)):
+        salience_arr[i] = salience_arr[i].tolist()
+        pitch_stab_arr[i] = pitch_stab_arr[i].tolist()
+        beat_strength_arr[i] = beat_strength_arr[i].tolist()
+        duration_arr[i] = duration_arr[i].tolist()
+
+        reduction_weights[i] = np.add(reduction_weights[i], salience_arr[i])
+        reduction_weights[i] = np.add(reduction_weights[i], pitch_stab_arr[i])
+        reduction_weights[i] = np.add(reduction_weights[i], beat_strength_arr[i])
+        reduction_weights[i] = np.add(reduction_weights[i], duration_arr[i])
+
+
+    for t in range(400):
+        thresh = t * 0.01
+        temp = []
+        new_count = 0
+        for i, m in enumerate(reduction_weights):
+            rm = []
+            for j, weight in enumerate(m):
+                if weight > thresh:
+                    rm.append(melodies[i][j])
+                    new_count += 1
+                else:
+                    rest = music21.note.Rest()
+                    rest.duration = melodies[i][j].duration
+                    rm.append(rest)
+
+            temp.append(rm)
+
+        r = (new_count / original)
+        print(new_count)
+        if r < ratio:
+            reduced = True
+            break
+
+
+    if reduced:
+        reduction = temp
+
+    else:
+        print("No reduction found")
+        reduction = pitched
+
+    return reduction
 
 
 def extract(score):
@@ -203,3 +333,22 @@ def extract(score):
     reduction, interval_reduction = melodic_reduction(melodies, pitched, intervals, pitch_weights)
 
     return chords, melodies, normal_order, pc0, numerals, pitched, intervals, pitch_weights, reduction, interval_reduction
+
+
+def reconstruct(score, reduced):
+    # score = [n for n in score.recurse().notesAndRests]
+    # flat_melody = [n for m in reduced for n in m]
+    # for index, note in enumerate(score):
+    #     if type(note) is music21.note.Note and type(note) is not music21.note.Rest:
+    #         if flat_melody:
+    #             n = flat_melody.pop(0)
+    #             n = music21.note.Note(n, quarterLength=note.duration.quarterLength)
+    #         else:
+    #             n = music21.note.Rest(quarterLength=note.duration.quarterLength)
+    #         score[index] = n
+    flat = [n for m in reduced for n in m]
+    S = stream.Stream()
+    for i in flat:
+        S.append(i)
+
+    return S
