@@ -40,6 +40,7 @@ def test1():
         # print(n)
         comparison_flags = analyse_prob_dist(dist, n)
         comparison_flags = (comparison_flags-np.min(comparison_flags))/(np.max(comparison_flags)-np.min(comparison_flags))
+
         rounded_flags = [np.round(flag) for flag in comparison_flags]
         # print(rounded_flags)
 
@@ -78,7 +79,6 @@ def test1():
     avg_tn = np.mean(tn)
     avg_fp = np.mean(fp)
     avg_fn = np.mean(fn)
-
     print("Average Accuracy: ", avg_accuracy, "%")
     return avg_accuracy, avg_similarity, avg_tp, avg_tn, avg_fp, avg_fn, test_flag_arr, comparison_flag_arr
 

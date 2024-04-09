@@ -39,7 +39,7 @@ def add_errors(score, err_amnt, file_name):
     len_notes = len(notes)
 
     flags = []
-    # get the indices of the notes to error
+    # randomly shift notes up and down one semitone
     for melody_ind, m in enumerate(pitched):
         temp = []
         for note_ind, n in enumerate(m):
@@ -50,6 +50,27 @@ def add_errors(score, err_amnt, file_name):
             else:
                 temp.append(0)
         flags.append(temp)
+
+    # random note addition
+    for melody_ind, m in enumerate(pitched):
+
+        length = len(m)
+        points = [1 if random.random() < 0.1 else 0 for i in range(length)]
+        for i in range(len(points)):
+            if points[i] == 1:
+                note = random.randint(min(m) - 12, max(m) + 12)
+                pitched[melody_ind].insert(i, note)
+                flags[melody_ind].insert(i, 1)
+
+
+      # random note deletion
+    for melody_ind, m in enumerate(pitched):
+        for i in range(4):
+            if m:
+                if random.random() < 0.1:
+                    to_delete = random.randint(0, len(m)-1)
+                    pitched[melody_ind].pop(to_delete)
+                    flags[melody_ind].pop(to_delete)
 
     # next recompute the intervals
     intervals = []

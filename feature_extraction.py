@@ -78,7 +78,7 @@ def pitchweight_extract(melodies):
     return weighted
 
 
-def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.25):
+def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.75):
     reduced = False
     original = 0
 
