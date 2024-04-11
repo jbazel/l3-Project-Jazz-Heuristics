@@ -14,6 +14,10 @@ def get_array_sim(arr1, arr2):
 
 paths = os.listdir("test_files")
 
+def get_num_notes(score):
+    notes = [i for i in score.recurse().notes]
+    return len(notes)
+
 def test1():
     comparison_flag_arr = []
     test_flag_arr = []
@@ -36,8 +40,10 @@ def test1():
         corpus = json.load(open("corpi/pitched_corpus.json"))
         note_probabilities = json.load(open("corpi/pitch_vec.json"))
 
-        dist, n = three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_probabilities, 0)
+        dist = three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_probabilities, 0)
         # print(n)
+        n = len(flatten(pitched))
+        print(n)
         comparison_flags = analyse_prob_dist(dist, n)
         comparison_flags = (comparison_flags-np.min(comparison_flags))/(np.max(comparison_flags)-np.min(comparison_flags))
 
