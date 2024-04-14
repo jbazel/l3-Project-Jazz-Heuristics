@@ -28,7 +28,8 @@ def test1():
     fp = []
     fn = []
     for path in paths:
-
+        if path[-5:] != ".json":
+            continue
         print("Testing: ", path)
         test_data = json.load(open("test_files/" + path))
         pitched = test_data["pitched"]
@@ -98,6 +99,8 @@ def test2():
     fp = []
     fn = []
     for path in paths:
+        if path[-5:] != ".json":
+            continue
         print("Testing: ", path)
         test_data = json.load(open("test_files/" + path))
         pitched = test_data["pitched"]
@@ -165,7 +168,8 @@ def test3():
     fp = []
     fn = []
     for path in paths:
-
+        if path[-5:] != ".json":
+            continue
         print("Testing: ", path)
         test_data = json.load(open("test_files/" + path))
         pitched = test_data["pitched"]
@@ -233,7 +237,8 @@ def test4():
     fp = []
     fn = []
     for path in paths:
-
+        if path[-5:] != ".json":
+            continue
         print("Testing: ", path)
         test_data = json.load(open("test_files/" + path))
         pitched = test_data["pitched"]

@@ -324,13 +324,13 @@ def melodic_reduction_test(melodies, pitched, intervals, pitch_weights, ratio=0.
     return reduction
 
 
-def extract(score):
+def extract(score, ratio=0.75):
     key = score.analyze('key')
     chords, melodies = chord_melody_separation(score)
     normal_order, pc0, numerals = chord_extract(chords, key)
     pitched, intervals = melody_extract(melodies)
     pitch_weights = pitchweight_extract(melodies)
-    reduction, interval_reduction = melodic_reduction(melodies, pitched, intervals, pitch_weights)
+    reduction, interval_reduction = melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=ratio)
 
     return chords, melodies, normal_order, pc0, numerals, pitched, intervals, pitch_weights, reduction, interval_reduction
 

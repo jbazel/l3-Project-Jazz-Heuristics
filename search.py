@@ -201,6 +201,8 @@ def analyse_prob_dist(dist, num_notes, thresh = 3):
 
     for i in range(len(z_scores)):
         if z_scores[i] < -thresh:
+            if max(dist[i][1]) > len(flags):
+                continue
             flags[dist[i][1]] += 1
     print([dist[i][1] for i in range(len(dist))])
     return flags

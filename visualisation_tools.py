@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import json
 import music21
 import sqlite3
-
+from builder import build
 from nltk.corpus.reader.reviews import TITLE
 from feature_extraction import extract, reconstruct, melodic_reduction_test
 pitch_vec = json.load(open("corpi/pitch_vec.json"))
@@ -63,4 +63,26 @@ def flag_vis():
     plt.show()
 
 
-flag_vis()
+def visualize_reduction_against_corp():
+    reductions = []
+    counts = []
+    for i in range(10):
+        build(1 - i * 0.1)
+        with open ("corpi/reduced_relative_corpus.json") as f:
+            reduction = json.load(f)
+            count = 0
+            for key in reduction:
+                for key2 in reduction[key]:
+                    count += 1
+
+        reductions.append(str(100 - (i*10)) + "%")
+        counts.append(count)
+
+    plt.plot(reductions, counts)
+    plt.xlabel("Reduction")
+    plt.ylabel("Number of Unique Melodies")
+    plt.title("Reduction Threshold vs. Number of Unique Melodies")
+
+    plt.show()
+
+visualize_reduction_against_corp()
