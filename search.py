@@ -123,7 +123,7 @@ def compare(gram, corpus, chord):
 
 
 
-def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_probabilities, flag):
+def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_probabilities, flag, key):
     start_note = 0
     # chords, \
     #     melodies, \
@@ -143,7 +143,7 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
     elif flag == 1:
         # potentially change this back
         # chord_set = numerals
-        chord_set = normal_order
+        chord_set = pc0
         melody_set = intervals
 
     else:
@@ -169,12 +169,17 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
                 start_note+=1
             else:
                 average_note_prob = 0
-                chord_key = stringify(normal_order[index])
+                chord_key = stringify(chord_set[index])
                 for note in pitched[index]:
+                    while note - 12 >= 0:
+                        note -= 12
                     note = str(note)
-                    if chord_key in note_probabilities:
-                        if note in note_probabilities[chord_key]:
-                            average_note_prob += note_probabilities[chord_key][note]
+                    average_note_prob += note_probabilities[key][note]
+                    # if chord_key in note_probabilities:
+                    #     if note in note_probabilities[chord_key]:gamcore
+                    #         average_note_prob += note_probabilities[chord_key][note]
+
+
                 average_note_prob /= len(search_gram)
                 prob = average_note_prob
                 # print("current search gram {} has probability: {}".format(search_gram, prob))
@@ -201,10 +206,16 @@ def analyse_prob_dist(dist, num_notes, thresh = 3):
 
     for i in range(len(z_scores)):
         if z_scores[i] < -thresh:
-            if max(dist[i][1]) > len(flags):
-                continue
-            flags[dist[i][1]] += 1
-    print([dist[i][1] for i in range(len(dist))])
+            if np.array(dist[i][1]).any() >= len(flags) - 2:
+                flags[-1] += 1
+
+            else:
+                try:
+                    flags[dist[i][1]] += 1
+                except:
+                    print(dist[i][1], len(flags))
+    # print([dist[i][1] for i in range(len(dist))])
+    # print(flags)
     return flags
 
 

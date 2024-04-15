@@ -16,9 +16,11 @@ cursor = db.cursor()
 cursor.execute(
     'SELECT DISTINCT t.path_leadsheet FROM works t INNER JOIN work_genres w ON t.id = w.id WHERE w.genre = "Jazz"')
 paths = cursor.fetchall()
-n = int(len(paths) -len(paths) / 10)
+n = int(len(paths) - len(paths) / 10)
 
 paths = paths[n:]
+
+
 
 def add_errors(score, err_amnt, file_name):
     chords, \
@@ -35,6 +37,7 @@ def add_errors(score, err_amnt, file_name):
     # first add errors to pitched melodies
 
     key = score.analyze('key')
+    key = key.tonicPitchNameWithCase
     notes = [n for n in score.recurse().notes]
     len_notes = len(notes)
 
@@ -77,8 +80,8 @@ def add_errors(score, err_amnt, file_name):
     for m in pitched:
         intervals.append([m[i + 1] - m[i] for i in range(len(m) - 1)])
 
-    with open(file_name, "w+") as f:
-        json.dump({"pitched": pitched, "intervals": intervals, "normal_order": normal_order, "pc0": pc0, "flags": flags}, f)
+    with open(file_name, "w") as f:
+        json.dump({"pitched": pitched, "intervals": intervals, "normal_order": normal_order, "pc0": pc0, "flags": flags, "key": key}, f)
 
 counter = 0
 for path in paths:

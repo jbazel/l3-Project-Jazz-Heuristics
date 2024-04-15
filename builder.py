@@ -25,7 +25,8 @@ def build(ratio):
     key_pitch_vec = dict()
     counter = 0
 
-    paths = paths[:int(len(paths) - len(paths) / 10)]
+    paths = paths[:int(len(paths) - len(paths) / 20)]
+
     for path in paths:
         counter += 1
         print("Processing: ", counter, " of ", len(paths))

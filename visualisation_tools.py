@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import json
 import music21
 import sqlite3
+import numpy as np
+import pandas as pd
+import seaborn as sns
 from builder import build
 from nltk.corpus.reader.reviews import TITLE
 from feature_extraction import extract, reconstruct, melodic_reduction_test
@@ -48,19 +51,77 @@ def reduction_vis():
     stream.show()
 
 def flag_vis():
-    test1_data = json.load(open("results/3gram_test1.json"))
-    test2_data = json.load(open("results/3gram_test2.json"))
-    test3_data = json.load(open("results/3gram_test3.json"))
-    test4_data = json.load(open("results/3gram_test4.json"))
+    # test1_data = json.load(open("results/3gram_test1-seen.json"))
+    # test2_data = json.load(open("results/3gram_test2-seen-0.75.json"))
+    # test3_data = json.load(open("results/3gram_test3-seen.json"))
+    # test4_data = json.load(open("results/3gram_test4-seen-0.75.json"))
 
-    flags = test4_data["test_flag_arr"]
-    real = test4_data["comparison_flag_arr"]
-    print(len(flags[30]))
-    print(len(real[30]))
-    plt.plot(flags[30])
-    plt.plot(real[30])
+    # flags = test4_data["test_flag_arr"]
+    # real = test4_data["comparison_flag_arr"]
+    # print(len(flags[30]))
+    # print(len(real[30]))
+    # plt.plot(flags[30])
+    # plt.plot(real[30])
 
-    plt.show()
+    # plt.show()
+
+    # test 1-seen:
+    with open("results/3gram_test1-unseen.json") as f:
+        test1_data = json.load(f)
+        real = test1_data["test_flag_arr"][10]
+        flags = np.array(test1_data["comparison_flag_arr"][10])
+        rounded_flags = [round(x) for x in flags]
+        true = [1 if (real[i] == 1 and rounded_flags[i] == 1) else 0 for i in range(len(real))]
+        flags = flags.reshape(1, len(flags))
+        fig, (ax,ax2, ax3, ax4) = plt.subplots(nrows=4, sharex=True, figsize=(10, 10))
+        sns.heatmap(flags, cmap='plasma', ax=ax, cbar=False)
+        color = fig.colorbar(ax.collections[0], ax=ax, orientation='horizontal', pad=0.2, location = 'top')
+        ax2.bar(range(len(rounded_flags)), rounded_flags, width=1)
+        ax3.bar(range(len(real)), real,width=1)
+        ax4.bar(range(len(true)), true, width=1)
+        plt.yticks([0])
+        ax.set_title("Uncertainty Flags", fontsize=12)
+        ax2.set_title("Rounded Uncertainties", fontsize=12)
+        ax3.set_title("True Errors", fontsize=12)
+        ax4.set_title("Correctly Flagged Errors", fontsize=12)
+        ax.set_yticks([])
+        ax2.set_yticks([])
+        ax3.set_yticks([])
+        ax4.set_yticks([])
+        ax4.set_xlabel("Note Displacement")
+        fig.tight_layout(pad=0.5)
+        plt.show()
+
+    with open("results/3gram_test3-unseen.json") as f:
+        test1_data = json.load(f)
+        real = test1_data["test_flag_arr"][0]
+        flags = np.array(test1_data["comparison_flag_arr"][0])
+        rounded_flags = [round(x) for x in flags]
+        print(len(real))
+        print(len(rounded_flags))
+        true = [1 if (real[i] == 1 and rounded_flags[i] == 1) else 0 for i in range(len(real))]
+        flags = flags.reshape(1, len(flags))
+
+
+        fig, (ax,ax2, ax3, ax4) = plt.subplots(nrows=4, sharex=True, figsize=(10, 10))
+        sns.heatmap(flags, cmap='plasma', ax=ax, cbar=False)
+        color = fig.colorbar(ax.collections[0], ax=ax, orientation='horizontal', pad=0.2, location = 'top')
+        ax2.bar(range(len(rounded_flags)), rounded_flags, width=1)
+        ax3.bar(range(len(real)), real,width=1)
+        ax4.bar(range(len(true)), true, width=1)
+        plt.yticks([0])
+        ax.set_title("Uncertainty Flags", fontsize=12)
+        ax2.set_title("Rounded Uncertainties", fontsize=12)
+        ax3.set_title("True Errors", fontsize=12)
+        ax4.set_title("Correctly Flagged Errors", fontsize=12)
+        ax.set_yticks([])
+        ax2.set_yticks([])
+        ax3.set_yticks([])
+        ax4.set_yticks([])
+        ax4.set_xlabel("Note Displacement")
+        fig.tight_layout(pad=0.5)
+        plt.show()
+
 
 
 def visualize_reduction_against_corp():
@@ -85,4 +146,5 @@ def visualize_reduction_against_corp():
 
     plt.show()
 
-visualize_reduction_against_corp()
+# visualize_reduction_against_corp()
+flag_vis()

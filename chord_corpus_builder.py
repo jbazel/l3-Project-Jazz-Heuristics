@@ -24,6 +24,8 @@ def update_key_vec(key, melodies, corp):
     for m in melodies:
         for n in m:
             pitch = n.pitch.midi
+            while pitch - 12 >= 0:
+                pitch -= 12
             if pitch in corp[key]:
                 corp[key][pitch] += n.quarterLength
             else:
