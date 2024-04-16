@@ -68,8 +68,8 @@ def flag_vis():
     # test 1-seen:
     with open("results/3gram_test1-unseen.json") as f:
         test1_data = json.load(f)
-        real = test1_data["test_flag_arr"][10]
-        flags = np.array(test1_data["comparison_flag_arr"][10])
+        real = test1_data["test_flag_arr"][25]
+        flags = np.array(test1_data["comparison_flag_arr"][25])
         rounded_flags = [round(x) for x in flags]
         true = [1 if (real[i] == 1 and rounded_flags[i] == 1) else 0 for i in range(len(real))]
         flags = flags.reshape(1, len(flags))
@@ -94,12 +94,11 @@ def flag_vis():
 
     with open("results/3gram_test3-unseen.json") as f:
         test1_data = json.load(f)
-        real = test1_data["test_flag_arr"][0]
-        flags = np.array(test1_data["comparison_flag_arr"][0])
+        real = test1_data["test_flag_arr"][25]
+        flags = np.array(test1_data["comparison_flag_arr"][25])
         rounded_flags = [round(x) for x in flags]
-        print(len(real))
-        print(len(rounded_flags))
         true = [1 if (real[i] == 1 and rounded_flags[i] == 1) else 0 for i in range(len(real))]
+        false = [1 if (real[i] == 0 and rounded_flags[i] == 1) else 0 for i in range(len(real))]
         flags = flags.reshape(1, len(flags))
 
 
@@ -113,7 +112,7 @@ def flag_vis():
         ax.set_title("Uncertainty Flags", fontsize=12)
         ax2.set_title("Rounded Uncertainties", fontsize=12)
         ax3.set_title("True Errors", fontsize=12)
-        ax4.set_title("Correctly Flagged Errors", fontsize=12)
+        ax4.set_title("True Positives", fontsize=12)
         ax.set_yticks([])
         ax2.set_yticks([])
         ax3.set_yticks([])

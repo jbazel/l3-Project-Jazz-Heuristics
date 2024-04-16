@@ -42,6 +42,7 @@ def add_errors(score, err_amnt, file_name):
     len_notes = len(notes)
 
     flags = []
+    interval_flags = []
     # randomly shift notes up and down one semitone
     for melody_ind, m in enumerate(pitched):
         temp = []
@@ -77,11 +78,23 @@ def add_errors(score, err_amnt, file_name):
 
     # next recompute the intervals
     intervals = []
-    for m in pitched:
-        intervals.append([m[i + 1] - m[i] for i in range(len(m) - 1)])
+    for i, m in enumerate(pitched):
+        temp = []
+        temp_melody = []
+        for j, n in enumerate(m):
+            if j == 0:
+                continue
+
+            temp_melody.append(n - m[j - 1])
+            if flags[i][j] == 1 or flags[i][j-1] == 1:
+                temp.append(1)
+            else:
+                temp.append(0)
+        intervals.append(temp_melody)
+        interval_flags.append(temp)
 
     with open(file_name, "w") as f:
-        json.dump({"pitched": pitched, "intervals": intervals, "normal_order": normal_order, "pc0": pc0, "flags": flags, "key": key}, f)
+        json.dump({"pitched": pitched, "intervals": intervals, "normal_order": normal_order, "pc0": pc0, "flags": flags, "interval_flags":interval_flags, "key": key}, f)
 
 counter = 0
 for path in paths:
@@ -91,4 +104,4 @@ for path in paths:
     # if len(score.recurse().getElementsByClass(meter.TimeSignature)) == 0:
     #     print("ERROR: Invalid Time Signature - Skipping")
     #     continue
-    add_errors(score, 0.4, "test_files/" + str(counter) + ".json")
+    add_errors(score, 0.1, "test_files/" + str(counter) + ".json")

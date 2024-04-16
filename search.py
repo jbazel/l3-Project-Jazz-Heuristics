@@ -154,7 +154,7 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
     for index, m in enumerate(melody_set):
         low = 0
         ciel = len(m)
-        high = 3 if len(m) > 3 else len(m)
+        high = 3 if len(m) > 2 else len(m) - 1
 
         while low < ciel + 1:
             search_gram = m[low:high]
@@ -190,8 +190,7 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
             high = high + 1 if (high + 1 < ciel) else ciel
     return probs
 
-def analyse_prob_dist(dist, num_notes, thresh = 3):
-
+def analyse_prob_dist(dist, num_notes, thresh = 3.29):
     probs = [x[0] for x in dist]
     mean = statistics.mean(probs)
     if len(probs) > 1:
@@ -201,9 +200,6 @@ def analyse_prob_dist(dist, num_notes, thresh = 3):
     z_scores = [(x - mean) / variance for x in probs]
     flags =np.array([0]*num_notes)
     # print(z_scores)
-
-
-
     for i in range(len(z_scores)):
         if z_scores[i] < -thresh:
             if np.array(dist[i][1]).any() >= len(flags) - 2:
