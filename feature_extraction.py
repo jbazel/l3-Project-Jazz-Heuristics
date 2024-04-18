@@ -10,6 +10,16 @@ CONS_VEC = [1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0]
 def chord_melody_separation(score):
     melodies = []
     score = [n for n in score.recurse().notes]
+
+    has_chord = False
+    for n in score:
+        if type(n) == music21.harmony.ChordSymbol:
+            has_chord = True
+            break
+
+    if not has_chord:
+        return [''], score
+
     separation = [x for x in range(len(score)) if type(score[x]) == music21.harmony.ChordSymbol]
     chords = [score[i] for i in separation]
     separation.append(len(score))
@@ -332,6 +342,16 @@ def extract(score, ratio=0.75):
     reduction, interval_reduction = melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=ratio)
 
     return chords, melodies, normal_order, pc0, numerals, pitched, intervals, pitch_weights, reduction, interval_reduction
+
+def omr_extract(score, ratio=0.75):
+    key = score.analyze('key')
+    chords, melodies = chord_melody_separation(score)
+    normal_order, pc0, numerals = chord_extract(chords, key)
+    pitched, intervals = melody_extract(melodies)
+    pitch_weights = pitchweight_extract(melodies)
+
+    return chords, melodies, normal_order, pc0, numerals, pitched, intervals, pitch_weights
+
 
 
 def reconstruct(score, reduced):

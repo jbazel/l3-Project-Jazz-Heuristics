@@ -2,6 +2,12 @@ import music21
 import sqlite3
 import random
 import os
+import json
+from feature_extraction import omr_extract
+from search import three_gram_search_test, analyse_prob_dist
+from builder import build
+
+
 def get_samples():
     db = sqlite3.connect('EWLD/EWLD.db')
     cursor = db.cursor()
@@ -18,7 +24,34 @@ def open_for_photo(samples):
     for i in range(len(samples)):
         path = "EWLD/" + samples[i][0]
         score = music21.converter.parse(path)
-        path = score.write('musicxml.png')
-        os.rename(str(path), 'omr_evaluation_images/image{}.png'.format(i))
-samples = get_samples()
-open_for_photo(samples)
+        path = score.write('musicxml.pdf')
+        os.rename(str(path), 'omr_evaluation_images/pdf{}.pdf'.format(i))
+# samples = get_samples()
+# open_for_photo(samples)
+
+def get_omr_outputs():
+    # build(0.25)
+    paths = os.listdir('omr_outputs/')
+    paths = sorted(paths)
+    for path in paths:
+        if path[-4:] == 'mscz':
+            continue
+        print("Processing: ", path)
+        score = music21.converter.parse("omr_outputs/" + path)
+        key = score.analyze('key')
+        key = key.tonicPitchNameWithCase
+        chords, \
+            melodies, \
+            normal_order, \
+            pc0, \
+            numerals, \
+            pitched, \
+            intervals, \
+            pitch_weights = omr_extract(score, 0.25)
+
+        print(melodies)
+        corpus = json.load(open("corpi/reduced_pitched_corpus.json"))
+        note_probabilities = json.load(open("corpi/key_pitch_vec.json"))
+        print(three_gram_search_test(pitched, intervals, normal_order, numerals, corpus, note_probabilities, 0, key))
+
+get_omr_outputs()
