@@ -16,7 +16,7 @@ def build(ratio):
     cursor.execute(
         'SELECT DISTINCT t.path_leadsheet FROM works t INNER JOIN work_genres w ON t.id = w.id WHERE w.genre = "Jazz"')
     paths = cursor.fetchall()
-
+    db.close()
     pitched_corp = dict()
     relative_corp = dict()
     reduced_pitched_corp = dict()
@@ -26,6 +26,7 @@ def build(ratio):
     counter = 0
 
     paths = paths[:int(len(paths) - len(paths) / 20)]
+
 
     for path in paths:
         counter += 1

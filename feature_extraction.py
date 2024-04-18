@@ -29,6 +29,7 @@ def chord_extract(chords, key):
         norm = c.normalOrder
         fp = norm[0]
         rotate = [(n - fp) % 12 for n in norm]
+        # rotate.insert(0, c.root().name)
         normal_orders.append(norm)
         pc0.append(rotate)
 
@@ -189,8 +190,6 @@ def melodic_reduction(melodies, pitched, intervals, pitch_weights, ratio=0.75):
         reduction = temp
 
     else:
-
-
         reduction = pitched
 
     intervals = []

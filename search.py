@@ -123,7 +123,7 @@ def compare(gram, corpus, chord):
 
 
 
-def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_probabilities, flag, key):
+def three_gram_search_test(pitched, intervals, normal_order, numerals, corpus, note_probabilities, flag, key):
     start_note = 0
     # chords, \
     #     melodies, \
@@ -143,7 +143,7 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
     elif flag == 1:
         # potentially change this back
         # chord_set = numerals
-        chord_set = pc0
+        chord_set = numerals
         melody_set = intervals
 
     else:
@@ -190,7 +190,7 @@ def three_gram_search_test(pitched, intervals, normal_order, pc0, corpus, note_p
             high = high + 1 if (high + 1 < ciel) else ciel
     return probs
 
-def analyse_prob_dist(dist, num_notes, thresh = 3.29):
+def analyse_prob_dist(dist, num_notes, thresh = 3):
     probs = [x[0] for x in dist]
     mean = statistics.mean(probs)
     if len(probs) > 1:

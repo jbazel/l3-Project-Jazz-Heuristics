@@ -94,7 +94,7 @@ def add_errors(score, err_amnt, file_name):
         interval_flags.append(temp)
 
     with open(file_name, "w") as f:
-        json.dump({"pitched": pitched, "intervals": intervals, "normal_order": normal_order, "pc0": pc0, "flags": flags, "interval_flags":interval_flags, "key": key}, f)
+        json.dump({"pitched": pitched, "intervals": intervals, "normal_order": normal_order, "pc0": pc0, "numerals": numerals, "flags": flags, "interval_flags":interval_flags, "key": key}, f)
 
 counter = 0
 for path in paths:
