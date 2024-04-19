@@ -125,17 +125,6 @@ def compare(gram, corpus, chord):
 
 def three_gram_search_test(pitched, intervals, normal_order, numerals, corpus, note_probabilities, flag, key):
     start_note = 0
-    # chords, \
-    #     melodies, \
-    #     normal_order, \
-    #     pc0, \
-    #     numerals, \
-    #     pitched, \
-    #     intervals, \
-    #     pitch_weights, \
-    #     reduction, \
-    #     interval_reduction = extract(score)
-
     if flag == 0:
         chord_set = normal_order
         melody_set = pitched
@@ -169,25 +158,23 @@ def three_gram_search_test(pitched, intervals, normal_order, numerals, corpus, n
                 start_note+=1
             else:
                 average_note_prob = 0
-                chord_key = stringify(chord_set[index])
-                for note in pitched[index]:
+                for note in search_gram:
                     while note - 12 >= 0:
                         note -= 12
                     note = str(note)
-                    average_note_prob += note_probabilities[key][note]
-                    # if chord_key in note_probabilities:
-                    #     if note in note_probabilities[chord_key]:gamcore
-                    #         average_note_prob += note_probabilities[chord_key][note]
-
-
+                    if note in note_probabilities[key]:
+                        average_note_prob += note_probabilities[key][note]
+                    else:
+                        average_note_prob += 0
                 average_note_prob /= len(search_gram)
                 prob = average_note_prob
-                # print("current search gram {} has probability: {}".format(search_gram, prob))
+
                 probs.append([prob, [start_note+i for i in range(3)]])
                 start_note+=1
 
             low += 1
             high = high + 1 if (high + 1 < ciel) else ciel
+
     return probs
 
 def analyse_prob_dist(dist, num_notes, thresh = 3):
@@ -213,11 +200,3 @@ def analyse_prob_dist(dist, num_notes, thresh = 3):
     # print([dist[i][1] for i in range(len(dist))])
     # print(flags)
     return flags
-
-
-# score = music21.converter.parse('EWLD/dataset/Adam_Anders-Nikki_Hassman-Peer_Åström/If_Only/If_Only.mxl')
-# probs_pitched, n = three_gram_search(score, json.load(open('corpi/reduced_pitched_corpus.json')), json.load(open('corpi/pitch_vec.json')), 0)
-# probs_unpitched, n = three_gram_search(score, json.load(open('corpi/reduced_relative_corpus.json')), json.load(open('corpi/pitch_vec.json')), 1)
-
-# analyse_prob_dist(probs_pitched, n)
-# analyse_prob_dist(probs_unpitched, n)

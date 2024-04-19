@@ -18,7 +18,7 @@ def chord_melody_separation(score):
             break
 
     if not has_chord:
-        return [''], score
+        return [''], [score]
 
     separation = [x for x in range(len(score)) if type(score[x]) == music21.harmony.ChordSymbol]
     chords = [score[i] for i in separation]
@@ -317,7 +317,6 @@ def melodic_reduction_test(melodies, pitched, intervals, pitch_weights, ratio=0.
             temp.append(rm)
 
         r = (new_count / original)
-        print(new_count)
         if r < ratio:
             reduced = True
             break
@@ -346,11 +345,19 @@ def extract(score, ratio=0.75):
 def omr_extract(score, ratio=0.75):
     key = score.analyze('key')
     chords, melodies = chord_melody_separation(score)
-    normal_order, pc0, numerals = chord_extract(chords, key)
-    pitched, intervals = melody_extract(melodies)
-    pitch_weights = pitchweight_extract(melodies)
+    if chords != ['']:
+        normal_order, pc0, numerals = chord_extract(chords, key)
+        pitched, intervals = melody_extract(melodies)
+        pitch_weights = pitchweight_extract(melodies)
 
-    return chords, melodies, normal_order, pc0, numerals, pitched, intervals, pitch_weights
+        return chords, melodies, normal_order, pc0, numerals, pitched, intervals, pitch_weights
+
+    else:
+        pitched, intervals = melody_extract(melodies)
+        pitch_weights = pitchweight_extract(melodies)
+
+
+        return chords, melodies, [''], [''], [''], pitched, intervals, pitch_weights
 
 
 

@@ -6,7 +6,7 @@ import json
 from feature_extraction import omr_extract
 from search import three_gram_search_test, analyse_prob_dist
 from builder import build
-
+from utils import flatten
 
 def get_samples():
     db = sqlite3.connect('EWLD/EWLD.db')
@@ -49,9 +49,10 @@ def get_omr_outputs():
             intervals, \
             pitch_weights = omr_extract(score, 0.25)
 
-        print(melodies)
+
         corpus = json.load(open("corpi/reduced_pitched_corpus.json"))
         note_probabilities = json.load(open("corpi/key_pitch_vec.json"))
-        print(three_gram_search_test(pitched, intervals, normal_order, numerals, corpus, note_probabilities, 0, key))
-
+        n = len(flatten(pitched))
+        flags = analyse_prob_dist(three_gram_search_test(pitched, intervals, normal_order, numerals, corpus, note_probabilities, 0, key), n)
+        print(flags)
 get_omr_outputs()
