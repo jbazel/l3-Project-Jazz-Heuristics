@@ -1,24 +1,28 @@
 import matplotlib.pyplot as plt
 import json
 import music21
+from music21 import *
+from sklearn.metrics import RocCurveDisplay
 import sqlite3
 import numpy as np
 import pandas as pd
+from pandas.core.reshape.pivot import Index
 import seaborn as sns
 from builder import build
 from nltk.corpus.reader.reviews import TITLE
 from feature_extraction import extract, reconstruct, melodic_reduction_test
 pitch_vec = json.load(open("corpi/pitch_vec.json"))
-
+from test_data_creation import add_errors_for_vis
 from search import three_gram_search
 
-
+from utils import stringify
 
 db = sqlite3.connect('EWLD/EWLD.db')
 cursor = db.cursor()
 cursor.execute(
     'SELECT DISTINCT t.path_leadsheet FROM works t INNER JOIN work_genres w ON t.id = w.id WHERE w.genre = "Jazz"')
 paths = cursor.fetchall()
+
 
 def reduction_vis():
     path = "EWLD/" + paths[10][0]
@@ -51,23 +55,23 @@ def reduction_vis():
     stream.show()
 
 def reduction_flag_vis():
-    with open("results/3gram_test1-seen.json") as f1, open("results/3gram_test2-seen-0.25.json") as f2, \
-            open("results/3gram_test2-seen-0.5.json") as f3, open("results/3gram_test2-seen-0.75.json") as f4:
+    with open("results/3gram_test1-seen.json") as f1, open("results/3gram_test2-seen-0.75.json") as f2, \
+            open("results/3gram_test2-seen-0.5.json") as f3, open("results/3gram_test2-seen-0.25.json") as f4:
         test1_data = json.load(f1)
         test2_data_25 = json.load(f2)
         test2_data_50 = json.load(f3)
         test2_data_75 = json.load(f4)
-        real1 = test1_data["test_flag_arr"][51]
-        flags1 = np.array(test1_data["comparison_flag_arr"][51])
+        real1 = test1_data["test_flag_arr"][21]
+        flags1 = np.array(test1_data["comparison_flag_arr"][21])
         flags1 = flags1.reshape(1, len(flags1))
 
-        flags2 = np.array(test2_data_25["comparison_flag_arr"][51])
+        flags2 = np.array(test2_data_25["comparison_flag_arr"][21])
         flags2 = flags2.reshape(1, len(flags2))
 
-        flags3 = np.array(test2_data_50["comparison_flag_arr"][51])
+        flags3 = np.array(test2_data_50["comparison_flag_arr"][21])
         flags3 = flags3.reshape(1, len(flags3))
 
-        flags4 = np.array(test2_data_75["comparison_flag_arr"][51])
+        flags4 = np.array(test2_data_75["comparison_flag_arr"][20])
         flags4 = flags4.reshape(1, len(flags4))
 
         fig, (ax,ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, sharex=True, figsize=(10, 10))
@@ -93,23 +97,23 @@ def reduction_flag_vis():
         fig.tight_layout(pad=0.5)
         plt.show()
 
-    with open("results/3gram_test3-seen.json") as f1, open("results/3gram_test4-seen-0.25.json") as f2, \
-            open("results/3gram_test4-seen-0.5.json") as f3, open("results/3gram_test4-seen-0.75.json") as f4:
+    with open("results/3gram_test3-unseen.json") as f1, open("results/3gram_test4-unseen-0.75.json") as f2, \
+            open("results/3gram_test4-unseen-0.5.json") as f3, open("results/3gram_test4-unseen-0.25.json") as f4:
         test1_data = json.load(f1)
         test2_data_25 = json.load(f2)
         test2_data_50 = json.load(f3)
         test2_data_75 = json.load(f4)
-        real1 = test1_data["test_flag_arr"][51]
-        flags1 = np.array(test1_data["comparison_flag_arr"][51])
+        real1 = test1_data["test_flag_arr"][61]
+        flags1 = np.array(test1_data["comparison_flag_arr"][61])
         flags1 = flags1.reshape(1, len(flags1))
 
-        flags2 = np.array(test2_data_25["comparison_flag_arr"][51])
+        flags2 = np.array(test2_data_25["comparison_flag_arr"][61])
         flags2 = flags2.reshape(1, len(flags2))
 
-        flags3 = np.array(test2_data_50["comparison_flag_arr"][51])
+        flags3 = np.array(test2_data_50["comparison_flag_arr"][61])
         flags3 = flags3.reshape(1, len(flags3))
 
-        flags4 = np.array(test2_data_75["comparison_flag_arr"][51])
+        flags4 = np.array(test2_data_75["comparison_flag_arr"][61])
         flags4 = flags4.reshape(1, len(flags4))
 
         fig, (ax,ax2, ax3, ax4, ax5) = plt.subplots(nrows=5, sharex=True, figsize=(10, 10))
@@ -138,16 +142,164 @@ def reduction_flag_vis():
 
 
 def get_most_acc_test():
-    with open("results/stats-3gram_test2-seen-0.75.json") as f:
-        data = json.load(f)
-        max_acc = 0
-        for i in data.keys():
-            acc = data[i]['precision']
-            if acc > max_acc:
-                max_acc = acc
-                best = i
+    with open("results/stats-3gram_test1-seen.json") as f1, \
+    open("results/stats-3gram_test1-unseen.json") as f2, \
+    open("results/stats-3gram_test2-seen-0.25.json") as f3, \
+    open("results/stats-3gram_test2-unseen-0.25.json") as f4, \
+    open("results/stats-3gram_test2-seen-0.5.json") as f5, \
+    open("results/stats-3gram_test2-unseen-0.5.json") as f6, \
+    open("results/stats-3gram_test2-seen-0.75.json") as f7, \
+    open("results/stats-3gram_test2-unseen-0.75.json") as f8:
 
-        print(best)
+        data1 = json.load(f1)
+        data2 = json.load(f2)
+        data3 = json.load(f3)
+        data4 = json.load(f4)
+        data5 = json.load(f5)
+        data6 = json.load(f6)
+        data7 = json.load(f7)
+        data8 = json.load(f8)
+
+        datas = [[data1, "test-1-seen"], \
+        [data2, "test-1-unseen"],\
+        [data3, "test-2-0.25-seen"], \
+        [data4, "test-2-0.25-unseen"],\
+        [data5, "test-2-0.5-seen"], \
+        [data6, "test-2-0.5-unseen"],\
+        [data7, "test-2-0.75-seen"], \
+        [data8, "test-2-0.75-unseen"]]
+
+        best_f1 = 0
+        best_test_pres = 0
+        best_test_recall = 0
+        best_test_acc = 0
+        best_test = ""
+        best_index = None
+        average_accuracies = []
+        average_f1s = []
+        for data in datas:
+            count = 0
+            avg_f1 = 0
+            avg_acc = 0
+            for index, test in enumerate(data[0].values()):
+                pres = test["precision"]
+                recall = test["recall"]
+                if pres + recall == 0:
+                    continue
+                acc = test["accuracy"]
+                f1 = 2 * (pres * recall) / (pres + recall)
+
+                avg_f1 += f1
+                avg_acc += acc
+                count += 1
+
+
+                if f1 > best_f1:
+                    best_f1 = f1
+                    best_test_pres = pres
+                    best_test_recall = recall
+                    best_test_acc = acc
+                    best_test = data[1]
+                    best_index = index
+
+            average_accuracies.append(avg_acc/count)
+            average_f1s.append(avg_f1/count)
+
+        average_accuracies = [(average_accuracies[i] + average_accuracies[i+1])/2 for i in range(0, len(average_accuracies), 2)]
+        average_f1s = [(average_f1s[i] + average_f1s[i+1])/2 for i in range(0, len(average_f1s), 2)]
+        print("Best Test: ", best_test)
+        print("Best F1: ", best_f1)
+        print("Best Precision: ", best_test_pres)
+        print("Best Recall: ", best_test_recall)
+        print("Best Accuracy: ", best_test_acc)
+        print("Best Index: ", best_index)
+        print("Average Accuracies: ", average_accuracies)
+        print("Average F1s: ", average_f1s)
+
+    with open("results/stats-3gram_test3-seen.json") as f1, \
+    open("results/stats-3gram_test3-unseen.json") as f2, \
+    open("results/stats-3gram_test4-seen-0.25.json") as f3, \
+    open("results/stats-3gram_test4-unseen-0.25.json") as f4, \
+    open("results/stats-3gram_test4-seen-0.5.json") as f5, \
+    open("results/stats-3gram_test4-unseen-0.5.json") as f6, \
+    open("results/stats-3gram_test4-seen-0.75.json") as f7, \
+    open("results/stats-3gram_test4-unseen-0.75.json") as f8:
+
+        data1 = json.load(f1)
+        data2 = json.load(f2)
+        data3 = json.load(f3)
+        data4 = json.load(f4)
+        data5 = json.load(f5)
+        data6 = json.load(f6)
+        data7 = json.load(f7)
+        data8 = json.load(f8)
+
+        datas = [[data1, "test-3-seen"], \
+        [data2, "test-3-unseen"],\
+        [data3, "test-4-0.25-seen"], \
+        [data4, "test-4-0.25-unseen"],\
+        [data5, "test-4-0.5-seen"], \
+        [data6, "test-4-0.5-unseen"],\
+        [data7, "test-4-0.75-seen"], \
+        [data8, "test-4-0.75-unseen"]]
+
+        best_f1 = 0
+        best_test_pres = 0
+        best_test_recall = 0
+        best_test_acc = 0
+        best_test = ""
+        best_index = None
+        average_accuracies = []
+        average_f1s = []
+
+
+        for data in datas:
+            count = 0
+            avg_f1 = 0
+            avg_acc = 0
+            for index, test in enumerate(data[0].values()):
+                pres = test["precision"]
+                recall = test["recall"]
+                if pres + recall == 0:
+                    continue
+                acc = test["accuracy"]
+                f1 = 2 * (pres * recall) / (pres + recall)
+                avg_f1 += f1
+                avg_acc += acc
+                count += 1
+                if f1 > best_f1:
+                    best_f1 = f1
+                    best_test_pres = pres
+                    best_test_recall = recall
+                    best_test_acc = acc
+                    best_test = data[1]
+                    best_index = index
+
+            average_accuracies.append(avg_acc/count)
+            average_f1s.append(avg_f1/count)
+
+
+        print("--------------------")
+        average_accuracies = [(average_accuracies[i] + average_accuracies[i+1])/2 for i in range(0, len(average_accuracies), 2)]
+        average_f1s = [(average_f1s[i] + average_f1s[i+1])/2 for i in range(0, len(average_f1s), 2)]
+        print("Best Test: ", best_test)
+        print("Best F1: ", best_f1)
+        print("Best Precision: ", best_test_pres)
+        print("Best Recall: ", best_test_recall)
+        print("Best Accuracy: ", best_test_acc)
+        print("Best Index: ", best_index)
+        print("Average Accuracies: ", average_accuracies)
+        print("Average F1s: ", average_f1s)
+
+
+
+
+
+
+
+
+
+
 
 
 def flag_vis():
@@ -213,52 +365,80 @@ def flag_vis():
 
 
 def visualize_accuracy_with_reduction():
-    key_dep_100 = open("results/stats-3gram_test1-seen.json")
-    key_dep_75 = open("results/stats-3gram_test2-seen-0.75.json")
-    key_dep_50 = open("results/stats-3gram_test2-seen-0.5.json")
-    key_dep_25 = open("results/stats-3gram_test2-seen-0.25.json")
+    acc_dep = [0.5295856835393198, 0.643415787338521, 0.6246888086186316, 0.6008383963851374]
+    f1_dep = [0.26393193198987125, 0.22624082867681677, 0.2403772647531024, 0.25627506854725296]
 
-    key_dep_100_data = json.load(key_dep_100)
-    key_dep_75_data = json.load(key_dep_75)
-    key_dep_50_data = json.load(key_dep_50)
-    key_dep_25_data = json.load(key_dep_25)
+    acc_indep = [0.5313309185971187, 0.572707010671565, 0.5811873699708818, 0.5816035407609089]
+    f1_indep = [0.38328484742376623, 0.23241898685051549, 0.2726489419538305, 0.30310579756469275]
+    plt.plot([0, 25, 50, 75], acc_dep, label="KDC Accuracy")
+    plt.plot([0, 25, 50, 75], acc_indep, label="KIC Accuracy")
 
-    key_indep_100 = open("results/stats-3gram_test3-seen.json")
-    key_indep_75 = open("results/stats-3gram_test4-seen-0.75.json")
-    key_indep_50 = open("results/stats-3gram_test4-seen-0.5.json")
-    key_indep_25 = open("results/stats-3gram_test4-seen-0.25.json")
-
-    key_indep_100_data = json.load(key_indep_100)
-    key_indep_75_data = json.load(key_indep_75)
-    key_indep_50_data = json.load(key_indep_50)
-    key_indep_25_data = json.load(key_indep_25)
-
-    acc_dep_100 = np.mean([i['accuracy'] for i in key_dep_100_data.values()])
-    acc_dep_75 = np.mean([i['accuracy'] for i in key_dep_75_data.values()])
-    acc_dep_50 = np.mean([i['accuracy'] for i in key_dep_50_data.values()])
-    acc_dep_25 = np.mean([i['accuracy'] for i in key_dep_25_data.values()])
-
-    acc_indep_100 = np.mean([i['accuracy'] for i in key_indep_100_data.values()])
-    acc_indep_75 = np.mean([i['accuracy'] for i in key_indep_75_data.values()])
-    acc_indep_50 = np.mean([i['accuracy'] for i in key_indep_50_data.values()])
-    acc_indep_25 = np.mean([i['accuracy'] for i in key_indep_25_data.values()])
-
-    acc_dep = [acc_dep_100, acc_dep_75, acc_dep_50, acc_dep_25]
-    acc_indep = [acc_indep_100, acc_indep_75, acc_indep_50, acc_indep_25]
-
-    print(acc_dep)
-    print(acc_indep)
-    plt.plot([0, 25, 50, 75], acc_dep, label="Key Dependent")
-    plt.plot([0, 25, 50, 75], acc_indep, label="Key Independent")
     plt.legend()
     plt.xlabel("Percentage of Reduction")
     plt.ylabel("Accuracy")
     plt.title("Accuracy vs. Percentage of Reduction")
+    plt.show()
 
+    plt.plot([0, 25, 50, 75], f1_dep, label="KDC f1 Score")
+    plt.plot([0, 25, 50, 75], f1_indep, label="KIC f1 Score")
 
+    plt.legend()
+    plt.xlabel("Percentage of Reduction")
+    plt.ylabel("f1 Score")
+    plt.title("f1 Score vs. Percentage of Reduction")
     plt.show()
 
 
+def vis_best():
+    with open("results/3gram_test2-seen-0.75.json") as f1, open("results/3gram_test3-unseen.json") as f2:
+        data_kd = json.load(f1)
+        data_ki = json.load(f2)
+
+        uncertainties_kd = data_kd["comparison_flag_arr"][51]
+        true_kd = data_kd["test_flag_arr"][51]
+        rounded_flags = [round(x) for x in uncertainties_kd]
+        uncertainties_kd = np.array(uncertainties_kd).reshape(1, len(uncertainties_kd))
+        true = [1 if (true_kd[i] == 1 and rounded_flags[i] == 1) else 0 for i in range(len(true_kd))]
+
+        fig, (ax, ax2, ax3) = plt.subplots(nrows=3, sharex=True, figsize=(10, 7))
+        sns.heatmap(uncertainties_kd, cmap='plasma', ax=ax, cbar=False)
+        color = fig.colorbar(ax.collections[0], ax=ax, orientation='horizontal', pad=0.2, location = 'top')
+        ax2.bar(range(len(true_kd)), true_kd, width=1)
+        ax3.bar(range(len(true)), true, width=1)
+        plt.yticks([0])
+        ax.set_title("Uncertainty Flags", fontsize=12)
+        ax2.set_title("True Errors", fontsize=12)
+        ax3.set_title("True Positives", fontsize=12)
+        ax.set_yticks([])
+        ax2.set_yticks([])
+        ax3.set_yticks([])
+        ax3.set_xlabel("Note Displacement")
+        plt.xticks(ticks = [i for i in range(0, len(true), 5)], labels =  [str(i) for i in range(0, len(true), 5)])
+        fig.tight_layout(pad=0.5)
+        plt.show()
+
+        uncertainties_ki = data_ki["comparison_flag_arr"][61]
+        true_ki = data_ki["test_flag_arr"][61]
+        rounded_flags = [round(x) for x in uncertainties_ki]
+        uncertainties_ki = np.array(uncertainties_ki).reshape(1, len(uncertainties_ki))
+        true = [1 if (true_ki[i] == 1 and rounded_flags[i] == 1) else 0 for i in range(len(true_ki))]
+
+        fig, (ax,ax2, ax3) = plt.subplots(nrows=3, sharex=True, figsize=(10, 7))
+        sns.heatmap(uncertainties_ki, cmap='plasma', ax=ax, cbar=False)
+        color = fig.colorbar(ax.collections[0], ax=ax, orientation='horizontal', pad=0.2, location = 'top')
+        ax2.bar(range(len(true_ki)), true_ki, width=1)
+        ax3.bar(range(len(true)), true, width=1)
+        plt.yticks([0])
+        ax.set_title("Uncertainty Flags", fontsize=12)
+        ax2.set_title("True Errors", fontsize=12)
+        ax3.set_title("True Positives", fontsize=12)
+        ax.set_yticks([])
+        ax2.set_yticks([])
+        ax3.set_yticks([])
+        ax3.set_xlabel("Note Displacement")
+        plt.xticks(ticks = [i for i in range(0, len(true), 5)], labels =  [str(i) for i in range(0, len(true),5)])
+        fig.tight_layout(pad=0.5)
+        plt.show()
 
 
 def visualize_reduction_against_corp():
@@ -301,6 +481,7 @@ def get_corp_sizes():
         num_chords = 0
         num_mels = 0
         for key in corp:
+            print(key)
             num_chords += 1
             for key2 in corp[key]:
                 num_mels += 1
@@ -348,6 +529,86 @@ def vis_pitch_vec():
 
 
 
+def visualize_test_data():
+    path = "EWLD/" + paths[10][0]
+    score = music21.converter.parse(path)
+    key = score.analyze('key')
+    error_melodies, flags = add_errors_for_vis(score, 0.1)
+
+    stream = music21.stream.Stream()
+    notes = [n for n in score.recurse().notes if n.isNote]
+    for note in notes:
+        n = music21.note.Note()
+        n.pitch.midi = note.pitch.midi
+        stream.append(n)
+
+    stream.show()
+
+
+    print(flags)
+    stream = music21.stream.Stream()
+    for melody in error_melodies:
+        for note in melody:
+            n = music21.note.Note()
+            n.pitch.midi = note
+            stream.append(n)
+    stream.show()
+
+
+
+
+
+
+
+
+def get_percent_missing_meter():
+    total_scores = 0
+    total_missing = 0
+    for path in paths:
+        total_scores += 1
+        path = "EWLD/" + path[0]
+        score = music21.converter.parse(path)
+        if len(score.recurse().getElementsByClass(meter.TimeSignature)) == 0:
+            print("ERROR: Invalid Time Signature - Skipping")
+            total_missing += 1
+
+    print(total_missing, total_scores)
+    print(total_missing / total_scores)
+
+
+def get_chord_encoding_counts():
+    numerals = []
+    norm_order = []
+    pc0 = []
+    pitchedNames = []
+    for path in paths:
+        score = music21.converter.parse("EWLD/" + path[0])
+        key = score.analyze('key')
+        chords = [n for n in score.recurse().notes if n.isChord]
+        for chord in chords:
+            num = music21.roman.romanNumeralFromChord(chord, key)
+            num = num.figure
+            numerals.append(num)
+            fp = chord.normalOrder[0]
+            rotate = [(n - fp) % 12 for n in chord.normalOrder]
+
+            norm_order.append(stringify(chord.normalOrder))
+            pc0.append(stringify(rotate))
+
+            pitchedNames.append(chord.pitchedCommonName)
+
+    norm_order = set(norm_order)
+    numerals = set(numerals)
+    pc0 = set(pc0)
+    pitchedNames = set(pitchedNames)
+    print("norm order: ", len(norm_order))
+    print("numerals: ", len(numerals))
+    print("pc0: ", len(pc0))
+    print("pitchedNames: ", len(pitchedNames))
+
+
+
+
 # vis_pitch_vec()
 # get_corp_sizes()
 # visualize_reduction_against_corp()
@@ -355,3 +616,10 @@ def vis_pitch_vec():
 # visualize_accuracy_with_reduction()
 # reduction_flag_vis()
 # get_most_acc_test()
+# visualize_test_data()
+# get_percent_missing_meter()
+# get_chord_encoding_counts()
+
+# get_most_acc_test()
+# vis_best()
+print(len(paths))

@@ -1,4 +1,5 @@
 import music21
+from music21.note import NotRest
 import numpy as np
 import random
 import json
@@ -19,6 +20,80 @@ paths = cursor.fetchall()
 n = int(len(paths) - len(paths) / 10)
 
 paths = paths[n:]
+
+def add_errors_for_vis(score, err_amnt):
+    chords, \
+        melodies, \
+        normal_order, \
+        pc0, \
+        numerals, \
+        pitched, \
+        intervals, \
+        pitch_weights, \
+        reduction, \
+        interval_reduction = extract(score)
+
+    key = score.analyze('key')
+    key = key.tonicPitchNameWithCase
+    notes = [n for n in score.recurse().notes]
+    stream = music21.stream.Stream()
+    flags = []
+    interval_flags = []
+
+
+    # randomly shift notes up and down one semitone
+    for melody_ind, m in enumerate(pitched):
+        temp = []
+        for note_ind, n in enumerate(m):
+            if random.random() < err_amnt:
+                n += random.choice([-1, 1])  # add a random amount to the note
+                pitched[melody_ind][note_ind] = n
+                temp.append("moved")
+            else:
+                temp.append("normal")
+        flags.append(temp)
+
+    # random note addition
+    for melody_ind, m in enumerate(pitched):
+
+        length = len(m)
+        points = [1 if random.random() < 0.1 else 0 for i in range(length)]
+        for i in range(len(points)):
+            if points[i] == 1:
+
+                note = random.randint(min(m) - 12, max(m) + 12)
+                pitched[melody_ind].insert(i, note)
+                flags[melody_ind].insert(i, "addition")
+
+
+        # random note deletion
+    for melody_ind, m in enumerate(pitched):
+        for i in range(4):
+            if m:
+                if random.random() < 0.1:
+                    to_delete = random.randint(0, len(m)-1)
+                    pitched[melody_ind].pop(to_delete)
+                    flags[melody_ind].pop(to_delete)
+
+    # next recompute the intervals
+    intervals = []
+    for i, m in enumerate(pitched):
+        temp = []
+        temp_melody = []
+        for j, n in enumerate(m):
+            if j == 0:
+                continue
+
+            temp_melody.append(n - m[j - 1])
+            if flags[i][j] == 1 or flags[i][j-1] == 1:
+                temp.append(1)
+            else:
+                temp.append(0)
+        intervals.append(temp_melody)
+        interval_flags.append(temp)
+
+    return pitched, flags
+
 
 
 
