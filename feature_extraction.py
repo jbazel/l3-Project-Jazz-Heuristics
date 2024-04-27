@@ -4,8 +4,6 @@ import numpy as np
 from sklearn import preprocessing
 from utils import flatten
 
-CONS_VEC = [1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0]
-
 
 def chord_melody_separation(score):
     melodies = []
@@ -43,7 +41,6 @@ def chord_extract(chords, key):
         normal_orders.append(norm)
         pc0.append(rotate)
 
-        #  generate GCT
         numeral = music21.roman.romanNumeralFromChord(c, key)
         # print(numeral.figure)
         numerals.append(numeral.figure)
@@ -360,18 +357,7 @@ def omr_extract(score, ratio=0.75):
         return chords, melodies, [''], [''], [''], pitched, intervals, pitch_weights
 
 
-
 def reconstruct(score, reduced):
-    # score = [n for n in score.recurse().notesAndRests]
-    # flat_melody = [n for m in reduced for n in m]
-    # for index, note in enumerate(score):
-    #     if type(note) is music21.note.Note and type(note) is not music21.note.Rest:
-    #         if flat_melody:
-    #             n = flat_melody.pop(0)
-    #             n = music21.note.Note(n, quarterLength=note.duration.quarterLength)
-    #         else:
-    #             n = music21.note.Rest(quarterLength=note.duration.quarterLength)
-    #         score[index] = n
     flat = [n for m in reduced for n in m]
     S = stream.Stream()
     for i in flat:

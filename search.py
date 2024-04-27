@@ -10,6 +10,7 @@ def stringify(val):
     return ','.join([str(x) for x in val])
 
 
+# this method is depreciated
 def three_gram_search(score, corpus, note_probabilities, flag):
     chords, \
         melodies, \
